@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+  <title id="title">Commander Toolbox</title>
+  <desc id="desc">Your Linux setup, in one place. Shells, dotfiles, themes and system tools.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111b2b"/><stop offset="1" stop-color="#20384b"/></linearGradient>
+    <linearGradient id="accent"><stop stop-color="#86bbd8"/><stop offset="1" stop-color="#5eead4"/></linearGradient>
+  </defs>
+  <rect width="960" height="260" rx="20" fill="url(#bg)"/>
+  <path d="M750 0L900 130 750 260M850 0L1000 130 850 260" fill="none" stroke="#86bbd8" stroke-opacity=".07" stroke-width="32"/>
+  <g fill="none" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="50" y="86" width="118" height="94" rx="12"/>
+    <path d="M83 86V71H135V86M50 115H168M81 138L92 148 81 158M106 158H128"/>
+  </g>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+    <text x="205" y="68" fill="#5eead4" font-size="13" letter-spacing="3">COMMANDER / LINUX UTILITIES</text>
+    <text x="201" y="122" fill="#f0f6fc" font-size="49" font-weight="700" letter-spacing="-1.5">Commander Toolbox</text>
+    <text x="205" y="161" fill="#a9d3e6" font-size="23">Your Linux setup, in one place.</text>
+    <text x="205" y="207" fill="#a7b5c8" font-size="14" letter-spacing="2">SHELLS / DOTFILES / THEMES / SYSTEM TOOLS</text>
+  </g>
+</svg>

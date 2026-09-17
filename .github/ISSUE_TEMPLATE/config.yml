@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Linutil documentation
-    url: https://chris-titus-docs.github.io/linutil-docs/
-    about: check out the docs
+  - name: Commander Toolbox guide
+    url: https://github.com/Commanderx-code/commander-toolbox/blob/main/docs/guide.md
+    about: Setup instructions, compatibility and recovery details.

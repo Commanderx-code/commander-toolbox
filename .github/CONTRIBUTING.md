@@ -1,70 +1,36 @@
-# Contributing Guidelines for Linutil
+# Contributing to Commander Toolbox
 
-Thank you for considering contributing to Linutil! We appreciate your effort in helping improve this project. To ensure that your contributions align with the goals and quality standards of Linutil, please follow these guidelines:
+Open an issue or pull request in [Commander Toolbox](https://github.com/Commanderx-code/commander-toolbox).
+Describe the problem, affected distribution and expected behavior. For interface
+issues, include the terminal name and a screenshot when useful.
 
-## 1. **Install Rust**: 
+## Local development
 
-Make sure you have Rust installed on your machine. You can install it by following the instructions at [rust-lang.org](https://www.rust-lang.org/tools/install).
+Fork this repository, clone your fork, and install a current Rust toolchain,
+Python 3, ShellCheck and checkbashisms. Read [AGENTS.md](../AGENTS.md) and
+[SPEC.md](../SPEC.md) for the repository conventions.
 
-## 2. **Fork and Clone the repo**
+```sh
+cargo run --locked --package linutil_tui
+```
 
-1. Make a fork of the repo in GitHub
-2. Clone the fork
-```bash
-git clone https://github.com/YOUR_USERNAME_HERE/linutil.git
-cd linutil
-   ```
+Utilities live under `core/tabs/`; custom installers live under
+`core/tabs/commander/`. Add menu entries in the relevant `tab_data.toml`.
+Keep changes focused, preserve existing configurations and use the shared
+package-manager helpers. Test bootloader and service changes in a disposable VM.
 
-## 3. Make your changes
+## Validate changes
 
-- **Edit the files you want to change**: Make your changes to the relevant files.
-- **Test your changes**: Run `cargo run` to test your modifications in a local environment and ensure everything works as expected.
+```sh
+python3 -B -m unittest discover -s tests -v
+cargo fmt --all --check
+cargo test --locked --no-fail-fast --package linutil_core --package linutil_tui
+cargo clippy --locked -- -Dwarnings
+```
 
-## 4. Understand the existing code
+For shell changes, run ShellCheck and checkbashisms on the affected POSIX scripts.
+For catalog changes, run `cargo xtask docgen` and include the generated walkthrough.
+Run `git diff --check` before submitting.
 
-- **Have a clear reason**: Don’t change the way things are done without a valid reason. If you propose an alteration, be prepared to explain why it’s necessary and how it improves the project.
-- **Respect existing conventions**: Changes should align with the existing code style, design patterns, and overall project philosophy. If you want to introduce a new way of doing things, justify it clearly.
-
-## 5. Learn from Past Pull Requests (PRs)
-
-- **Check merged PRs**: Reviewing merged pull requests can give you an idea of what kind of contributions are accepted and how they are implemented.
-- **Study rejected PRs**: This is especially important as it helps you avoid making similar mistakes or proposing changes that have already been considered and declined.
-
-## 6. Write Clean, Descriptive Commit Messages
-
-- **Be descriptive**: Your commit messages should clearly describe what the change does and why it was made.
-- **Use the imperative mood**: For example, "Add feature X" or "Fix bug in Y", rather than "Added feature X" or "Fixed bug in Y".
-- **Keep commits clean**: Avoid committing a change and then immediately following it with a fix for that change. Instead, amend your commit or squash it if needed.
-
-## 7. Keep Your Pull Requests (PRs) Small and Focused
-
-- **Make small, targeted PRs**: Focus on one feature or fix per pull request. This makes it easier to review and increases the likelihood of acceptance.
-- **Avoid combining unrelated changes**: PRs that tackle multiple unrelated issues are harder to review and might be rejected because of a single problem.
-
-## 8. Understand and Test the Code You Write
-
-- **Review your code**: Before submitting your changes, take the time to review your code for readability, efficiency and performance. Consider how your changes affect the project.
-- **Avoid using LLMs**: Don't submit AI-generated code without reviewing and testing it first. Ensure that any code you submit is thoroughly understood and meets the project's standards.
-- **Testing Requirements**: Failure to conduct testing after multiple requests may result in the closure of your Pull Request.
-
-## 9. Code Review and Feedback
-
-- **Expect feedback**: PRs will undergo code review. Be open to feedback and willing to make adjustments as needed.
-- **Participate in reviews**: If you feel comfortable, review other contributors' PRs as well. Peer review is a great way to learn and ensure high-quality contributions.
-
-## 10. Contributing Is More Than Just Code
-
-- **Test the tool**: Running tests and providing feedback on how the tool works in different environments is a valuable contribution.
-- **Write well-formed issues**: Clearly describe bugs or problems you encounter, providing as much detail as possible, including steps to reproduce the issue.
-- **Propose reasonable feature requests**: When suggesting new features, ensure they fit within the scope, style, and design of the project. Provide clear reasoning and use cases.
-
-## 11. Documentation
-
-- **Update the documentation**: If your change affects the functionality, please update the relevant documentation files to reflect this.
-- **Automatic generation**: If you decide to add functionality through a new shell script, make sure to fill out all fields in `tab_data.toml` and run `cargo xtask docgen`.
-
-## 12. License
-
-- **Agree to the license**: By contributing to Linutil, you agree that your contributions will be licensed under the project's MIT license.
-
-We appreciate your contributions and look forward to collaborating with you to make Linutil better!
+Explain what changed, why, how it was tested, and any untested platform behavior
+in the pull request. Preserve upstream attribution and third-party licenses.
