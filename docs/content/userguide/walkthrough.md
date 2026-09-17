@@ -71,24 +71,51 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
+- **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
+
+### Myfish Shell Setup
+
+- **Myfish Fish (Native)**: Install Myfish with Fish using your native package manager. The installer confirms configuration changes.
+- **Myfish Bash (Native)**: Install Myfish with Bash using your native package manager. The installer confirms configuration changes.
+- **Myfish Zsh (Native)**: Install Myfish with Zsh using your native package manager. The installer confirms configuration changes.
+- **Myfish Guided Setup**: Choose native packages or Home Manager, then your shell and greeting. Use native packages on Fedora to preserve SELinux.
+
+### Dotfiles
+
+- **Commander Neovim Config**: Install your Neovim configuration from dotfiles with a backup of existing files. Install the application separately.
+- **Commander Fastfetch Config**: Install your Fastfetch configuration, automatic distro PNG launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal.
+- **Commander Starship Config**: Install your Starship configuration from dotfiles with a backup of existing files. Install the application separately.
+- **Commander Konsole Config**: Install your Konsole configuration from dotfiles with a backup of existing files. Install the application separately.
+- **Commander Ghostty Profile Config**: Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately.
+
+### Grub Theme
+
+- **Commander GRUB Theme**: Install your CachyOS-based GRUB theme from dotfiles. Back up existing settings and regenerate the current machine's GRUB menu while preserving kernel arguments.
+- **Catppuccin Mocha GRUB Theme**: Install the pastel Mocha theme from catppuccin/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+- **Dracula GRUB Theme**: Install the dark Dracula theme from dracula/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+- **Tela GRUB Theme**: Install Tela from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+- **Vimix GRUB Theme**: Install Vimix from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+- **CyberRe GRUB Theme**: Install CyberRe from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **Cyberpunk GRUB Theme**: Install Cyberpunk from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **Shodan GRUB Theme**: Install Shodan from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **Fallout GRUB Theme**: Install Fallout from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **DedSec GRUB Theme**: Install DedSec from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **Minegrub (Minecraft) GRUB Theme**: Install Minegrub (Minecraft) from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **BSOL GRUB Theme**: Install BSOL from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
+- **Restore Default GRUB Appearance**: Disable custom themes and backgrounds and restore a plain console menu. Preserves current kernel arguments, disk settings and boot entries; does not reinstall GRUB. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
-- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Dank Shell**: DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
-- **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
+- **SDDM Theme**: Install your SilentSDDM Revan theme, Qt6 dependencies and fonts. Requires existing SDDM 0.21+ and a successful graphical preview before activation.
 - **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
-- **Linutil Installer**: Installs a distro-specific Linutil package locally.
-- **Linutil Updater**: Updates your local Linutil crate installation.
 - **Noctalia Shell**: Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
 - **Shelly**: Shelly is a modern, visual, and intuitive interface for your Arch Linux system. Not just a wrapper, but a native ground-up experience.
-- **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
 
 ## Gaming
 
@@ -120,13 +147,20 @@ https://github.com/ChrisTitusTech/neovim
 ### Sega Emulators
 
 - **Blastem**: A Genesis emulator. NO Games are included
-- **Flycast**: A Dreamcase emulator. NO Games are included
+- **Flycast**: A Dreamcast emulator. NO Games are included
 - **Kronos**: A Sega Saturn emulator. NO Games are included
 
 ### Xbox Emulators
 
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
+
+### Game Launchers
+
+- **Heroic**: Manage Heroic launcher installation with Install, Uninstall, or Abort actions.
+- **Lutris**: Manage Lutris launcher installation with Install, Uninstall, or Abort actions.
+- **RetroArch**: Manage RetroArch launcher installation with Install, Uninstall, or Abort actions.
+- **Steam**: Manage Steam launcher installation with Install, Uninstall, or Abort actions.
 
 ### Tools and Setups
 
@@ -135,18 +169,11 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Gaming Dependencies**: Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers.
-- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
-- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
+- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
+- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
-
-### Game Launchers
-
-- **Steam**: Manage Steam launcher installation with Install, Uninstall, or Abort actions.
-- **Lutris**: Manage Lutris launcher installation with Install, Uninstall, or Abort actions.
-- **RetroArch**: Manage RetroArch launcher installation with Install, Uninstall, or Abort actions.
-- **Heroic**: Manage Heroic launcher installation with Install, Uninstall, or Abort actions.
 - **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
 - **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
 - **EverQuest Legends MIDI Fix**: Configures native Lutris to start a stable FluidSynth MIDI device, maps Wine to it, and loads the SC-55 SoundCanvas bank for EverQuest Legends music. Downloads a verified 177 MiB SoundFont and preserves the original Lutris and Wine registry configuration.
@@ -158,6 +185,8 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **FirewallD Firewall Baselines (CTT)**: Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes
 - **Lynis Security Audit**: Install Lynis when needed, run an elevated system security audit with live results, then optionally remove Lynis.
 - **UFW Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
+- **AppArmor Setup and Status**: Install AppArmor tools/profiles and enable its service on Arch or Debian/Ubuntu with an AppArmor-enabled kernel. Does not change boot arguments or replace SELinux.
+- **Fedora SELinux Tools and Status**: Install Fedora SELinux policy, management and diagnostic tools and show status. Preserves enforcement mode and existing local policy.
 
 ## System Setup
 
@@ -181,12 +210,16 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
 - **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
+- **Pacman Config**: Enables Color, ILoveCandy, ParallelDownloads, VerbosePkgLists, multilib in pacman.conf and sets MAKEFLAGS in makepkg.conf.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Snapper Snapshots**: Sets up Snapper with hourly Btrfs snapshots, snap-pac hooks, and GRUB boot menu entries.
+- **System Maintenance**: Enables paccache.timer, removes orphan packages, and cleans system journals.
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 
 ### Debian
 
+- **Nala Package Manager**: Install Nala from Debian repositories and configure apt as an interactive alias for nala in Bash, Zsh or Fish, with a backup. Use sudo nala for elevated commands; system APT remains available.
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 
 ### Desktop Environment Setup
@@ -212,10 +245,12 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Enable SSD TRIM**: Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
-- **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
+- **Commander Topgrade**: Install your Topgrade configuration adapted to this distro, with backups and update confirmations. Optionally run updates afterward.
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
+- **PipeWire Audio**: Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio).
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
+- **Zram Swap**: Configures compressed RAM swap via zram-generator with zstd algorithm.
 
 ## Utilities
 
@@ -244,10 +279,10 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### User Account Manager
 
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Locale Setup**: This allows the user to set their locale
+- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
-- **Ranalama**: This utility is designed to manage ramalama in your system
+- **Ramalama**: This utility is designed to manage ramalama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system

@@ -346,6 +346,238 @@ script = "browsers/helium-browser.sh"
 task_list = "I"
 
 [[data]]
+name = "Myfish Shell Setup"
+description = "Choose Fish, Bash, Zsh or the guided Myfish installer."
+multi_select = false
+
+[[data.entries]]
+name = "Myfish Fish (Native)"
+description = "Install Myfish with Fish using your native package manager. The installer confirms configuration changes."
+script = "../commander/myfish-fish.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Myfish Bash (Native)"
+description = "Install Myfish with Bash using your native package manager. The installer confirms configuration changes."
+script = "../commander/myfish-bash.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Myfish Zsh (Native)"
+description = "Install Myfish with Zsh using your native package manager. The installer confirms configuration changes."
+script = "../commander/myfish-zsh.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Myfish Guided Setup"
+description = "Choose native packages or Home Manager, then your shell and greeting. Use native packages on Fedora to preserve SELinux."
+script = "../commander/myfish.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data]]
+name = "Dotfiles"
+description = "Choose an individual configuration to install with backups. Fastfetch is installed when missing; other applications are installed separately. Symlink-managed files are preserved."
+multi_select = false
+
+[[data.entries]]
+name = "Commander Neovim Config"
+description = "Install your Neovim configuration from dotfiles with a backup of existing files. Install the application separately."
+script = "../commander/dotfiles-nvim.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Commander Fastfetch Config"
+description = "Install your Fastfetch configuration, automatic distro PNG launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal."
+script = "../commander/dotfiles-fastfetch.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Commander Starship Config"
+description = "Install your Starship configuration from dotfiles with a backup of existing files. Install the application separately."
+script = "../commander/dotfiles-starship.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Commander Konsole Config"
+description = "Install your Konsole configuration from dotfiles with a backup of existing files. Install the application separately."
+script = "../commander/dotfiles-konsole.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Commander Ghostty Profile Config"
+description = "Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately."
+script = "../commander/dotfiles-ghostty.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data]]
+name = "Grub Theme"
+
+[[data.entries]]
+name = "Commander GRUB Theme"
+description = "Install your CachyOS-based GRUB theme from dotfiles. Back up existing settings and regenerate the current machine's GRUB menu while preserving kernel arguments."
+script = "../commander/grub.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Catppuccin Mocha GRUB Theme"
+description = "Install the pastel Mocha theme from catppuccin/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-catppuccin.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Dracula GRUB Theme"
+description = "Install the dark Dracula theme from dracula/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-dracula.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Tela GRUB Theme"
+description = "Install Tela from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-tela.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Vimix GRUB Theme"
+description = "Install Vimix from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-vimix.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "CyberRe GRUB Theme"
+description = "Install CyberRe from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-cyberre.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Cyberpunk GRUB Theme"
+description = "Install Cyberpunk from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-cyberpunk.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Shodan GRUB Theme"
+description = "Install Shodan from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-shodan.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Fallout GRUB Theme"
+description = "Install Fallout from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-fallout.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "DedSec GRUB Theme"
+description = "Install DedSec from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-dedsec.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Minegrub (Minecraft) GRUB Theme"
+description = "Install Minegrub (Minecraft) from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-minegrub.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "BSOL GRUB Theme"
+description = "Install BSOL from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout."
+script = "../commander/grub-ctt-bsol.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Restore Default GRUB Appearance"
+description = "Disable custom themes and backgrounds and restore a plain console menu. Preserves current kernel arguments, disk settings and boot entries; does not reinstall GRUB. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-default.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -356,12 +588,6 @@ name = "Android Debloater"
 description = "Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience."
 script = "android-debloat.sh"
 task_list = "I"
-
-[[data]]
-name = "Bash Prompt"
-description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
-script = "mybash-setup.sh"
-task_list = "I FM"
 
 [[data]]
 name = "Dank Shell"
@@ -376,12 +602,6 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
-name = "Fastfetch"
-description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
-script = "fastfetch-setup.sh"
-task_list = "I FM"
-
-[[data]]
 name = "Flatpak / Flathub"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
@@ -394,38 +614,22 @@ script = "ghostty-setup.sh"
 task_list = "I FM"
 
 [[data]]
-name = "Grub Theme"
-description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB."
-script = "grub-theme.sh"
-task_list = "PFM"
+name = "SDDM Theme"
+description = "Install your SilentSDDM Revan theme, Qt6 dependencies and fonts. Requires existing SDDM 0.21+ and a successful graphical preview before activation."
+script = "../commander/sddm.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["sddm"]
 
 [[data]]
 name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty."
 script = "kitty-setup.sh"
 task_list = "I FM"
-
-[[data]]
-name = "Linutil Installer"
-description = "Installs a distro-specific Linutil package locally."
-script = "linutil-installer.sh"
-task_list = "I"
-
-[[data.preconditions]]
-matches = false
-data = "command_exists"
-values = ["linutil"]
-
-[[data]]
-name = "Linutil Updater"
-description = "Updates your local Linutil crate installation."
-script = "linutil-updater.sh"
-task_list = "I"
-
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["linutil"]
 
 [[data]]
 name = "Noctalia Shell"
@@ -460,10 +664,3 @@ task_list = "I SS"
 matches = true
 data = "command_exists"
 values = ["pacman"]
-
-[[data]]
-name = "ZSH Prompt"
-description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
-script = "zsh-setup.sh"
-task_list = "I FM"
-

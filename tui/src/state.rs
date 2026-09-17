@@ -27,7 +27,7 @@ const MIN_HEIGHT: u16 = 25;
 const FLOAT_SIZE: u16 = 95;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const LEFT_EXTRA_WIDTH: u16 = 4;
-const TITLE: &str = " LINUTIL ";
+const TITLE: &str = " COMMANDER TOOLBOX ";
 const LIST_HIGHLIGHT_SYMBOL: &str = "> ";
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
@@ -188,7 +188,7 @@ impl AppState {
             let prompt = ConfirmPrompt::new(&cmd_names);
             self.focus = Focus::ConfirmationPrompt(Float::new(
                 Box::new(prompt),
-                CONFIRM_PROMPT_FLOAT_SIZE,
+                80,
                 CONFIRM_PROMPT_FLOAT_SIZE,
             ));
         }
@@ -238,7 +238,7 @@ impl AppState {
 
             Focus::List => {
                 let mut hints = Vec::new();
-                hints.push(Shortcut::new("Exit linutil", ["q", "CTRL-c"]));
+                hints.push(Shortcut::new("Exit toolbox", ["q", "CTRL-c"]));
 
                 if self.at_root() {
                     hints.push(Shortcut::new("Focus tab list", ["h", "Left"]));
@@ -275,7 +275,7 @@ impl AppState {
             Focus::TabList => (
                 "Tab list",
                 shortcuts!(
-                    ("Exit linutil", ["q", "CTRL-c"]),
+                    ("Exit toolbox", ["q", "CTRL-c"]),
                     ("Focus action list", ["l", "Right", "Enter"]),
                     ("Select item above", ["k", "Up"]),
                     ("Select item below", ["j", "Down"]),
@@ -382,7 +382,7 @@ impl AppState {
             logo.draw(frame, left_chunks[0], &self.theme);
         } else {
             let label = Paragraph::new(Line::styled(
-                format!("Linutil V{}", env!("CARGO_PKG_VERSION")),
+                format!("Commander Toolbox V{}", env!("CARGO_PKG_VERSION")),
                 Style::default().fg(self.theme.tab_color()).bold(),
             ))
             .alignment(Alignment::Center);

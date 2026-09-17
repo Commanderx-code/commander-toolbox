@@ -1,8 +1,12 @@
-# Linutil Technical Specification
+# Commander Toolbox Technical Specification
 
 ## 1. Product definition
 
-Linutil is a terminal-based Linux utility that provides a searchable,
+Commander Toolbox is a local Linutil fork with the `commander-toolbox` executable
+and Commander Toolbox interface branding. Internal Rust crate names and existing
+installer data directories are retained for compatibility.
+
+Commander Toolbox is a terminal-based Linux utility that provides a searchable,
 organized catalog of system setup, application installation, gaming, security,
 and maintenance tasks.
 
@@ -382,3 +386,10 @@ Potential additions such as richer capability detection, structured command
 results, dry-run support, per-command privilege declarations, or stronger
 download verification should extend the catalog and core contracts rather
 than hard-code individual utilities into the TUI.
+
+### Command confirmation visibility
+
+Confirmation dialogs show the selected commands and separate, visible body rows
+for [Y] Run / Install and [N] Cancel. Actions must remain readable at the minimum
+supported terminal size rather than being clipped within the popup border.
+Existing confirmation keys and skip-confirmation behavior remain unchanged.

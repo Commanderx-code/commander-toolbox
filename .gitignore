@@ -35,3 +35,6 @@ desktop.ini
 *.sln
 *.sw?
 *~
+# Python validation artifacts
+__pycache__/
+*.pyc

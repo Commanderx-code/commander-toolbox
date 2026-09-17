@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=Linutil
+Name=Commander Toolbox
 Comment=Distro-agnostic toolbox designed to simplify everyday Linux tasks
-Exec=sh -c '/usr/bin/linutil || $HOME/.cargo/bin/linutil || linutil'
+Exec=commander-toolbox
 Icon=utilities-terminal
 Type=Application
 Terminal=true

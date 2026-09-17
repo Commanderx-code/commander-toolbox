@@ -3,6 +3,10 @@ use clap::Parser;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser, Clone)]
+#[command(
+    name = "commander-toolbox",
+    about = "Commander Toolbox - personalized Linux utilities"
+)]
 pub struct Args {
     /// Path to the configuration file
     #[arg(short, long)]

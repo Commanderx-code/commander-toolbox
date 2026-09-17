@@ -1,6 +1,6 @@
 [package]
 name = "linutil_tui"
-description = "Chris Titus Tech's Linux Toolbox - Linutil is a distro-agnostic toolbox designed to simplify everyday Linux tasks."
+description = "Commander Toolbox - a personalized Linux toolbox based on Linutil."
 documentation = "https://christitustech.github.io/linutil"
 readme = "../README.md"
 edition = "2021"
@@ -12,11 +12,11 @@ include = [
     "Cargo.toml",
     "cool_tips.txt",
     "assets/ctt_logo.png",
-    "../man/linutil.1",
+    "../man/commander-toolbox.1",
 ]
 
 [[bin]]
-name = "linutil"
+name = "commander-toolbox"
 path = "src/main.rs"
 
 [features]

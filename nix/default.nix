@@ -8,7 +8,7 @@ let
   pTUI = (lib.importTOML ../tui/Cargo.toml).package;
 in
 rustPlatform.buildRustPackage {
-  pname = "linutil";
+  pname = "commander-toolbox";
   inherit (p) version;
 
   src = ../.;
@@ -20,6 +20,6 @@ rustPlatform.buildRustPackage {
     homepage = pTUI.documentation;
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ adamperkowski ];
-    mainProgram = "linutil";
+    mainProgram = "commander-toolbox";
   };
 }

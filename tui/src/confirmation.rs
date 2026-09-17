@@ -4,7 +4,7 @@ use ratatui::{
     layout::Alignment,
     prelude::*,
     symbols::border,
-    widgets::{Block, Clear, List},
+    widgets::{Block, Clear, List, Paragraph},
 };
 use std::borrow::Cow;
 
@@ -45,7 +45,7 @@ impl ConfirmPrompt {
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll + self.inner_area_height < self.names.len().saturating_sub(1) {
+        if self.scroll + self.inner_area_height < self.names.len() {
             self.scroll += 1;
         }
     }
@@ -63,19 +63,18 @@ impl FloatContent for ConfirmPrompt {
             .border_set(border::PLAIN)
             .border_style(Style::default().fg(theme.focused_color()))
             .title(" CONFIRM SELECTIONS ")
-            .title_bottom(Line::from(vec![
-                Span::raw(" ["),
-                Span::styled("y", Style::default().fg(theme.success_color())),
-                Span::raw("] to continue ["),
-                Span::styled("n", Style::default().fg(theme.fail_color())),
-                Span::raw("] to abort "),
-            ]))
             .title_alignment(Alignment::Center)
             .title_style(Style::default().fg(theme.tab_color()).bold())
             .style(Style::default());
 
         let inner_area = block.inner(area);
-        self.inner_area_height = inner_area.height as usize;
+        let sections = Layout::vertical([
+            Constraint::Min(1),
+            Constraint::Length(1),
+            Constraint::Length(2),
+        ])
+        .split(inner_area);
+        self.inner_area_height = sections[0].height as usize;
 
         frame.render_widget(Clear, area);
         frame.render_widget(block, area);
@@ -90,7 +89,18 @@ impl FloatContent for ConfirmPrompt {
             })
             .collect::<Text>();
 
-        frame.render_widget(List::new(paths_text), inner_area);
+        frame.render_widget(List::new(paths_text), sections[0]);
+        let actions = Text::from(vec![
+            Line::styled(
+                "[Y] Run / Install",
+                Style::default().fg(theme.success_color()).bold(),
+            ),
+            Line::styled("[N] Cancel", Style::default().fg(theme.fail_color()).bold()),
+        ]);
+        frame.render_widget(
+            Paragraph::new(actions).alignment(Alignment::Center),
+            sections[2],
+        );
     }
 
     fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
@@ -137,12 +147,59 @@ impl FloatContent for ConfirmPrompt {
         (
             "Confirmation prompt",
             shortcuts!(
-                ("Continue", ["Y", "y"]),
+                ("Run / Install", ["Y", "y"]),
                 ("Abort", ["N", "n", "q", "Esc"]),
                 ("Scroll up", ["k", "Up"]),
                 ("Scroll down", ["j", "Down"]),
-                ("Close linutil", ["CTRL-c"]),
+                ("Close toolbox", ["CTRL-c"]),
             ),
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ratatui::{backend::TestBackend, crossterm::event::KeyModifiers, Terminal};
+
+    #[test]
+    fn install_and_cancel_are_visible_in_a_narrow_popup() {
+        let mut prompt = ConfirmPrompt::new(&["Alacritty"]);
+        let mut terminal = Terminal::new(TestBackend::new(24, 8)).unwrap();
+        terminal
+            .draw(|frame| prompt.draw(frame, frame.area(), &theme::Theme::Default))
+            .unwrap();
+        let buffer = terminal.backend().buffer();
+        let text = (0..8)
+            .map(|y| (0..24).map(|x| buffer[(x, y)].symbol()).collect::<String>())
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(text.contains("1. Alacritty"));
+        assert!(text.contains("[Y] Run / Install"));
+        assert!(text.contains("[N] Cancel"));
+    }
+
+    #[test]
+    fn confirmation_still_requires_an_explicit_choice() {
+        let mut prompt = ConfirmPrompt::new(&["Alacritty"]);
+        prompt.handle_key_event(&KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE));
+        assert!(matches!(prompt.status, ConfirmStatus::None));
+        prompt.handle_key_event(&KeyEvent::new(KeyCode::Char('y'), KeyModifiers::NONE));
+        assert!(matches!(prompt.status, ConfirmStatus::Confirm));
+        for code in [KeyCode::Char('n'), KeyCode::Esc] {
+            prompt.handle_key_event(&KeyEvent::new(code, KeyModifiers::NONE));
+            assert!(matches!(prompt.status, ConfirmStatus::Abort));
+        }
+    }
+
+    #[test]
+    fn scrolling_can_reach_the_last_selected_command() {
+        let mut prompt = ConfirmPrompt::new(&["one", "two", "three"]);
+        prompt.inner_area_height = 1;
+        prompt.scroll_down();
+        prompt.scroll_down();
+        assert_eq!(prompt.scroll, 2);
+        prompt.scroll_down();
+        assert_eq!(prompt.scroll, 2);
     }
 }

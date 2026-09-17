@@ -12,17 +12,17 @@ if ! command -v vhs &> /dev/null; then
     exit 1
 fi
 
-# Check if linutil binary exists
-if ! command -v linutil &> /dev/null && [ ! -f "./build/linutil" ] && [ ! -f "./target/release/linutil" ]; then
-    echo "Error: linutil binary not found"
+# Check if commander-toolbox binary exists
+if ! command -v commander-toolbox &> /dev/null && [ ! -f "./build/commander-toolbox" ] && [ ! -f "./target/release/commander-toolbox" ]; then
+    echo "Error: commander-toolbox binary not found"
     echo "Build it first with: cargo build --release"
     exit 1
 fi
 
-# Add linutil to PATH if needed
-if [ -f "./target/release/linutil" ]; then
+# Add commander-toolbox to PATH if needed
+if [ -f "./target/release/commander-toolbox" ]; then
     export PATH="$PWD/target/release:$PATH"
-elif [ -f "./build/linutil" ]; then
+elif [ -f "./build/commander-toolbox" ]; then
     export PATH="$PWD/build:$PATH"
 fi
 
