@@ -108,12 +108,12 @@ repos = [@DOTFILES_DIRECTORY@]
         with self.assertRaises(ValueError):
             configure.nala_alias_target(home, config, 'unsupported')
 
-    def test_nala_menu_is_debian_only_and_follows_arch(self):
+    def test_nala_menu_supports_apt_systems_and_follows_arch(self):
         entries = tomllib.loads((ROOT / 'core/tabs/system-setup/tab_data.toml').read_text())['data']
         names = [entry['name'] for entry in entries]
-        self.assertEqual(names.index('Debian'), names.index('Arch') + 1)
-        debian = entries[names.index('Debian')]
-        self.assertIn({'matches': True, 'data': {'containing_file': '/etc/os-release'}, 'values': ['ID=debian']}, debian['preconditions'])
+        self.assertEqual(names.index('Debian / Ubuntu'), names.index('Arch') + 1)
+        debian = entries[names.index('Debian / Ubuntu')]
+        self.assertIn({'matches': True, 'data': 'command_exists', 'values': ['apt-get']}, debian['preconditions'])
         nala = next(entry for entry in debian['entries'] if entry['name'] == 'Nala Package Manager')
         self.assertFalse(nala['multi_select'])
 

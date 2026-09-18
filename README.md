@@ -91,7 +91,7 @@ bootstrap scripts and package installers still target Linutil.
 | **Applications Setup → Dotfiles** | Install only the application configurations you want. |
 | **Applications Setup → Grub Theme** | Pick a theme or restore the plain GRUB menu. |
 | **Applications Setup → SDDM Theme** | Preview the login theme before activation. |
-| **System Setup → Debian → Nala Package Manager** | Add Nala and shell aliases while keeping the original APT executable. |
+| **System Setup → Debian / Ubuntu → Nala Package Manager** | Add Nala and shell aliases while keeping the original APT executable. |
 | **Security** | Select AppArmor or Fedora SELinux tools for your system. |
 
 GRUB choices include **Commander, Catppuccin Mocha, Dracula, Tela, Vimix,
@@ -144,7 +144,7 @@ The custom installers target conventional Linux installations:
 | Family | Package manager | Notes |
 | :--- | :--- | :--- |
 | Arch / Garuda | pacman | Native shell setup; Garuda-specific Topgrade updates. |
-| Debian / Ubuntu | apt / Nala | The Nala setup menu itself is Debian-only. |
+| Debian / Ubuntu | apt / Nala | Nala setup supports Debian/Ubuntu derivatives, including Zorin. |
 | Fedora | dnf | Native shell setup and SELinux tooling. |
 
 Compatibility is checked per utility. Custom installers reject OSTree/Atomic

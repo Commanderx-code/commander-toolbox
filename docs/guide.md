@@ -34,7 +34,7 @@ this build with the stock application through the menu.
 | Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors or optional Ghostty profile, with backups. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs your CachyOS-based theme while preserving current kernel/disk settings. |
 | Applications Setup | SDDM Theme | Installs the dedicated `sddm/` SilentSDDM Revan preset, previews it, then asks before activation. |
-| System Setup > Debian | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
+| System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
 | System Setup | Commander Topgrade | Replaces the default Topgrade action with your adapted config and an optional update run. |
 | Security | AppArmor Setup and Status | Installs tools/profiles and starts AppArmor on supported systems with an already-enabled kernel. |
 | Security | Fedora SELinux Tools and Status | Installs policy/management tools and reports status without changing enforcement mode. |
@@ -139,10 +139,14 @@ Installer tests use fixtures and temporary directories. Actual boot menu,
 login-screen and security-service changes still require VM testing on each
 target distro before considering them production-tested.
 
-### Debian Nala setup
+### Debian / Ubuntu Nala setup
 
-The Debian submenu follows Arch and is visible only on Debian. Nala comes from
-[Debian's repositories](https://packages.debian.org/stable/admin/nala).
+The Debian / Ubuntu submenu follows Arch and appears when `apt-get` is available.
+Nala setup accepts Debian, Ubuntu and derivatives identified by `ID_LIKE`, including
+Zorin. It uses your enabled distribution repositories and stops before changing
+aliases if no Nala package candidate is available. Ubuntu-based systems may need
+the Universe repository enabled; the installer does not add repositories automatically.
+The Debian Hyprland entry remains restricted to Debian.
 The installer adds an interactive `apt` alias to your login shell configuration
 (`.bashrc`, `$ZDOTDIR/.zshrc` or `.zshrc`, or Fish's configuration directory).
 Open a new terminal after installation. Re-running does not duplicate the block.

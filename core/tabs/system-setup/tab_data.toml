@@ -121,16 +121,16 @@ script = "arch/yay-setup.sh"
 task_list = "I"
 
 [[data]]
-name = "Debian"
+name = "Debian / Ubuntu"
 
 [[data.preconditions]]
 matches = true
-data = { containing_file = "/etc/os-release" }
-values = ["ID=debian"]
+data = "command_exists"
+values = ["apt-get"]
 
 [[data.entries]]
 name = "Nala Package Manager"
-description = "Install Nala from Debian repositories and configure apt as an interactive alias for nala in Bash, Zsh or Fish, with a backup. Use sudo nala for elevated commands; system APT remains available."
+description = "Install Nala on Debian, Ubuntu and derivatives such as Zorin from enabled distribution repositories and configure apt as an interactive alias for nala in Bash, Zsh or Fish, with a backup. Use sudo nala for elevated commands; system APT remains available."
 script = "debian/nala-setup.sh"
 task_list = "I MP FM"
 multi_select = false
@@ -140,6 +140,11 @@ name = "Hyprland JaKooLit"
 description = "Install JaKooLit's Hyprland configuration"
 script = "debian/hyprland-kool-deb.sh"
 task_list = "I MP"
+
+[[data.entries.preconditions]]
+matches = true
+data = { containing_file = "/etc/os-release" }
+values = ["ID=debian"]
 
 [[data]]
 name = "Desktop Environment Setup"

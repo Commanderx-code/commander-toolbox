@@ -220,9 +220,9 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 
-### Debian
+### Debian / Ubuntu
 
-- **Nala Package Manager**: Install Nala from Debian repositories and configure apt as an interactive alias for nala in Bash, Zsh or Fish, with a backup. Use sudo nala for elevated commands; system APT remains available.
+- **Nala Package Manager**: Install Nala on Debian, Ubuntu and derivatives such as Zorin from enabled distribution repositories and configure apt as an interactive alias for nala in Bash, Zsh or Fish, with a backup. Use sudo nala for elevated commands; system APT remains available.
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 
 ### Desktop Environment Setup
