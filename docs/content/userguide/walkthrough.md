@@ -20,6 +20,8 @@
 - **Ardour**: Ardour is a free and open-source digital audio workstation and hard disk recorder.
 - **Audacity**: Audacity is a free and open-source digital audio editor and recording application software.
 - **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
+- **DaVinci Resolve - Native**: Install DaVinci Resolve using Native on Fedora or Arch-family Linux. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations.
+- **DaVinci Resolve - Davincibox**: Install DaVinci Resolve using Davincibox on Fedora or Arch-family Linux. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations.
 - **Darktable**: Darktable is a free and open-source photography application and raw developer.
 - **GNU Image Manipulation Program (GIMP)**: GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats.
 - **Handbrake**: HandBrake is a free and open-source transcoder for digital video files.

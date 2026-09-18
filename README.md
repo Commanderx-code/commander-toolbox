@@ -34,6 +34,7 @@ and confirm each installation before it runs.
 | **Your configurations** | Individual Neovim, Fastfetch, Starship, Konsole and Ghostty configurations from Commander dotfiles. |
 | **A visual system overview** | Fastfetch with automatic distro PNG logos, image dependencies and terminal detection. |
 | **Boot and login themes** | Twelve GRUB themes, a plain GRUB restore option, and the Revan SDDM theme. |
+| **Video editing** | Native or Davincibox setup for DaVinci Resolve on Fedora and Arch, with dependency installation and a compatibility launcher. |
 | **Everyday maintenance** | A personalized Topgrade configuration and Debian Nala setup with an interactive `apt` alias. |
 | **Security tools** | AppArmor setup on supported systems and SELinux tools for Fedora. |
 
@@ -128,6 +129,7 @@ Nala alias removal and theme requirements.
 
 ## Documentation and development
 
+- [DaVinci Resolve setup](docs/resolve.md) — native and container installation requirements.
 - [Full setup guide](docs/guide.md) — installation details, compatibility and recovery.
 - [Command catalog](docs/content/userguide/walkthrough.md) — available utility entries.
 - [Technical specification](SPEC.md) — architecture and behavior requirements.

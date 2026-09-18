@@ -38,6 +38,7 @@ fetch_source() {
     checkCommandRequirements 'git'
     source_repo="Commanderx-code/$1"
     case "$1" in
+        davincibox) source_repo=zelikos/davincibox; revision=09e9fa7b296e27db6e888e392423181e8d7bfc2a ;;
         grub-catppuccin) source_repo=catppuccin/grub; revision=0a37ab19f654e77129b409fed371891c01ffd0b9 ;;
         grub-dracula) source_repo=dracula/grub; revision=0e721d99dbf0d5d6c4fd489b88248365b7a60d12 ;;
         grub-ctt) source_repo=ChrisTitusTech/bootloader-themes; revision=e3d1b5a3fce186000b628aaa12062cb31701842a ;;

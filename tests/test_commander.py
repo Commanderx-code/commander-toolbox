@@ -133,7 +133,7 @@ repos = [@DOTFILES_DIRECTORY@]
                         self.assertFalse(entry['multi_select'])
         for path in (ROOT / 'core/tabs').glob('*/tab_data.toml'):
             visit(tomllib.loads(path.read_text())['data'], path.parent)
-        self.assertEqual(len(found), 26)
+        self.assertEqual(len(found), 28)
 
 
 if __name__ == '__main__':
