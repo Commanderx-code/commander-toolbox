@@ -29,7 +29,7 @@ this build with the stock application through the menu.
 
 | Location | Entry | Behavior |
 | --- | --- | --- |
-| Applications Setup > Design Tools | DaVinci Resolve - Native / Davincibox | Install Resolve directly or in a dependency container on Fedora/Arch; see the [Resolve guide](resolve.md). |
+| Applications Setup > Design Tools | DaVinci Resolve - Native / Davincibox | Install Resolve directly or in a dependency container on Fedora/Arch or Debian/Ubuntu; see the [Resolve guide](resolve.md). |
 | Applications Setup | Myfish Shell Setup | Open the submenu for native Fish, Bash or Zsh, or Guided Setup to choose the backend interactively. |
 | Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors or optional Ghostty profile, with backups. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs your CachyOS-based theme while preserving current kernel/disk settings. |
@@ -54,12 +54,12 @@ when adopting a reviewed revision of your repositories.
 
 The two Resolve entries are under **Applications Setup > Design Tools**. Native
 installation uses distro packages; Davincibox builds a separate runtime environment.
-Both require the official Linux `.run` installer and a working host GPU driver.
+Davincibox also accepts Debian, Ubuntu and derivatives. Both require the official Linux `.run` installer and a working host GPU driver.
 The installers include library compatibility launchers and dependency checks.
 
 See the [Resolve guide](resolve.md) for GPU prerequisites, license acceptance,
 container disk requirements, recovery and the video/CTT references. GPU playback
-has not been validated on real Fedora or Arch hardware.
+has not been validated on real hardware across the supported distros.
 
 ## Configuration ownership and portability
 

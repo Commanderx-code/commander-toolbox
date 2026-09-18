@@ -59,6 +59,8 @@ fetch_source() { source_dir=$HOME; }
 ''')
             bin_dir = root / 'bin'
             bin_dir.mkdir()
+            (bin_dir / 'apt-get').write_text('#!/bin/sh\necho apt-get \"$@\" >> \"$HOME/packages\"\n')
+            (bin_dir / 'apt-cache').write_text('#!/bin/sh\nexit 0\n')
             (bin_dir / 'nvidia-smi').write_text('#!/bin/sh\nexit 0\n')
             (bin_dir / 'nvidia-ctk').write_text('#!/bin/sh\necho nvidia.com/gpu=all\n')
             (bin_dir / 'clinfo').write_text('#!/bin/sh\n' + ('echo "Device #0: Test GPU"\n' if device else 'exit 0\n'))
@@ -83,9 +85,10 @@ exec "$@"
             result = subprocess.run(['sh', '-e', './resolve.sh', mode], cwd=root,
                 input=f'{installer}\n{gpu}\n' + ('NO\n' if cancel else 'APPLY\n'), text=True, capture_output=True,
                 env=dict(os.environ, HOME=str(root), XDG_DATA_HOME=str(root / 'data'), DISPLAY=':1',
-                         TEST_DISTRO=distro, TEST_MANAGER='pacman' if distro == 'arch' else 'dnf',
+                         TEST_DISTRO=distro, ID_LIKE='ubuntu debian' if distro == 'linuxmint' else '',
+                         TEST_MANAGER='apt-get' if distro in ('debian', 'ubuntu', 'linuxmint') else ('pacman' if distro == 'arch' else 'dnf'),
                          PATH=str(bin_dir) + ':' + os.environ['PATH']))
-            successful = not (failure or runtime_failure or cancel or distro == 'debian' or (mode == 'native' and not device))
+            successful = not (failure or runtime_failure or cancel or (distro == 'debian' and mode == 'native') or (mode == 'native' and not device))
             self.assertEqual(result.returncode == 0, successful, result.stdout + result.stderr)
             self.assertEqual((root / '.local/bin/commander-resolve').exists(), successful)
             self.assertEqual(list(root.glob('.commander-resolve.*')), [])
@@ -97,7 +100,7 @@ exec "$@"
                     self.assertIn('intel-compute-runtime', packages)
                 else:
                     self.assertIn('opencl-nvidia' if distro == 'arch' else 'libnvidia-opencl.so.1', packages)
-            if cancel or distro == 'debian':
+            if cancel or (distro == 'debian' and mode == 'native'):
                 self.assertFalse((root / 'packages').exists())
 
     def test_fedora_native(self):
@@ -127,3 +130,46 @@ exec "$@"
     def test_failed_library_check_does_not_publish_launcher(self):
         self.run_installer(runtime_failure=True)
         self.run_installer(mode='container', runtime_failure=True)
+
+    def test_debian_ubuntu_and_mint_containers(self):
+        for distro in ('debian', 'ubuntu', 'linuxmint'):
+            with self.subTest(distro=distro):
+                self.run_installer(mode='container', distro=distro)
+                self.run_installer(mode='container', distro=distro, gpu='1')
+
+    def test_apt_nvidia_repository_uses_scoped_key_and_preserves_existing_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sources = root / 'sources'
+            keys = root / 'keys'
+            sources.mkdir()
+            keys.mkdir()
+            helper = (TOOLS / 'resolve-apt.sh').read_text().replace('/etc/apt/sources.list.d', str(sources)).replace('/usr/share/keyrings', str(keys))
+            (root / 'helper.sh').write_text(helper)
+            (root / 'run.sh').write_text('''#!/bin/sh -e
+ESCALATION_TOOL=env
+confirm() { :; }
+install_packages() { :; }
+backup_system() { :; }
+curl() {
+    case "$2" in
+        */gpgkey) printf 'test key' > "$4" ;;
+        *) printf 'deb https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /\n' > "$4" ;;
+    esac
+}
+gpg() { cp "$5" "$4"; }
+. ./helper.sh
+resolve_apt_nvidia
+''')
+            (root / 'apt-get').write_text('#!/bin/sh\nexit 0\n')
+            (root / 'apt-get').chmod(0o755)
+            env = dict(os.environ, PATH=str(root) + ':' + os.environ['PATH'])
+            result = subprocess.run(['sh', '-e', './run.sh'], cwd=root, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            source = sources / 'commander-nvidia-container-toolkit.list'
+            self.assertIn('signed-by=' + str(keys), source.read_text())
+            self.assertEqual((keys / 'commander-nvidia-container-toolkit.gpg').read_text(), 'test key')
+            source.write_text('existing custom settings')
+            result = subprocess.run(['sh', '-e', './run.sh'], cwd=root, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(source.read_text(), 'existing custom settings')

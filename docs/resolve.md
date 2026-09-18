@@ -3,8 +3,9 @@
 Open **Applications Setup > Design Tools** and select **DaVinci Resolve - Native**
 or **DaVinci Resolve - Davincibox**.
 
-Both entries target x86_64 Fedora and Arch-family installations with a graphical
-X11/XWayland session. Atomic/OSTree systems are not supported by this integration.
+Native targets Fedora and Arch-family installations. Davincibox additionally
+accepts Debian, Ubuntu and derivatives identified through `ID_LIKE` (including
+Linux Mint). Both require x86_64 and a graphical X11/XWayland session. Atomic/OSTree systems are not supported by this integration.
 Runtime checks still apply if your launcher exposes all catalog entries.
 
 ## Before installing
@@ -33,6 +34,24 @@ mix this with an AUR-managed installation. Existing native installations or a
 container of the same name are refused rather than overwritten. Back up projects
 before upgrades or removals. Installing a second method replaces the backed-up
 Commander launcher to select that method; it does not remove the first installation.
+
+## Debian and Ubuntu
+
+Choose **DaVinci Resolve - Davincibox**. The toolbox refreshes APT metadata and
+installs Podman, Distrobox, Git, uidmap, slirp4netns and fuse-overlayfs using APT
+or Nala. Your enabled repositories must provide these packages; older releases
+may need a newer distribution release. Resolve's libraries stay in the Fedora
+container. Native Debian/Ubuntu installation is not implemented.
+
+For NVIDIA, the installer offers the official toolkit APT repository with a
+repository-specific signing key, then installs the toolkit. Existing standard
+NVIDIA toolkit source lists are respected. CDI devices and a working host driver
+are still required. For AMD, `rocm-podman-support` is installed if available;
+otherwise check device permissions if the GPU cannot be accessed. Host GPU
+access can require render/video group membership and logging out and back in.
+
+These paths have mocked installer coverage, not real Debian/Ubuntu GPU validation.
+Davincibox describes these distributions as community-supported.
 
 ## Dependencies and compatibility
 
@@ -103,4 +122,4 @@ they are not security sandboxes or backups.
 
 Installer orchestration and launcher generation are tested with mocks and temporary
 files. Actual GPU acceleration, video playback and installation require testing
-with Blackmagic's installer on Fedora and Arch hardware.
+with Blackmagic's installer on each supported distribution.

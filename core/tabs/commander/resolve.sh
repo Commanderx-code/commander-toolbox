@@ -4,8 +4,17 @@
 mode=${1:-}
 case "$mode" in native | container) ;; *) exit 1 ;; esac
 checkDistro
-case "$DTYPE" in fedora | arch | garuda | endeavouros | cachyos | manjaro) ;; *)
-    printf '%s\n' 'Resolve setup supports Fedora and Arch-family systems only.' >&2; exit 1 ;;
+case "$DTYPE" in
+    fedora | arch | garuda | endeavouros | cachyos | manjaro) ;;
+    *)
+        case " $DTYPE ${ID_LIKE:-} " in
+            *' debian '* | *' ubuntu '*)
+                [ "$mode" = container ] || {
+                    printf '%s\n' 'Use the Davincibox option on Debian/Ubuntu. Native setup currently supports Fedora/Arch only.' >&2
+                    exit 1
+                } ;;
+            *) printf '%s\n' 'Unsupported distro: use Fedora, Arch, or Debian/Ubuntu-family Davincibox.' >&2; exit 1 ;;
+        esac ;;
 esac
 [ "$(uname -m)" = x86_64 ] || { printf '%s\n' 'Resolve Linux requires x86_64.' >&2; exit 1; }
 commander_init
@@ -73,7 +82,19 @@ case "$mode" in
         }
         ;;
     container)
-        install_packages podman distrobox git
+        case "$PACKAGER" in
+            apt-get | nala)
+                "$ESCALATION_TOOL" apt-get update
+                install_packages podman distrobox git uidmap slirp4netns fuse-overlayfs
+                if [ "$gpu" = 2 ]; then
+                    if apt-cache show rocm-podman-support >/dev/null 2>&1; then
+                        install_packages rocm-podman-support
+                    else
+                        printf '%s\n' 'ROCm container helper unavailable in these repositories. If GPU access fails, check /dev/kfd and render/video group access.'
+                    fi
+                fi ;;
+            *) install_packages podman distrobox git ;;
+        esac
         if [ "$gpu" = 1 ]; then
             if ! command_exists nvidia-ctk; then
                 if [ "$PACKAGER" = dnf ] && [ ! -e /etc/yum.repos.d/nvidia-container-toolkit.repo ]; then
@@ -86,6 +107,12 @@ case "$mode" in
                     rm -f -- "$repo_file"
                     trap - 0
                 fi
+                case "$PACKAGER" in
+                    apt-get | nala)
+                        # shellcheck source=core/tabs/commander/resolve-apt.sh
+                        . ./resolve-apt.sh
+                        resolve_apt_nvidia ;;
+                esac
                 install_packages nvidia-container-toolkit
             fi
             nvidia-ctk cdi list | grep -q 'nvidia.com/gpu=' || {

@@ -86,7 +86,7 @@ values = ["/run/ostree-booted"]
 
 [[data.entries]]
 name = "DaVinci Resolve - Davincibox"
-description = "Install DaVinci Resolve using Davincibox on Fedora or Arch-family Linux. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations."
+description = "Install DaVinci Resolve using Davincibox on Fedora, Arch, Debian, Ubuntu or their supported derivatives. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations."
 script = "../commander/resolve-container.sh"
 task_list = "I PFM MP FM"
 multi_select = false
