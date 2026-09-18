@@ -186,3 +186,12 @@ such as APPLY appear after the command starts.
 
 These are established theme projects, not a claim of a precise popularity
 ranking. Live boot appearance still needs VM or real-machine validation.
+
+### Toolbox logo in Konsole
+
+The toolbox uses the PNG logo through the iTerm inline-image protocol in direct
+Konsole sessions version 22.04 or later (`KONSOLE_VERSION`). Other terminals keep
+automatic protocol detection. Inside tmux or screen, protocol detection remains
+with the image library because image forwarding depends on the multiplexer.
+Unsupported terminals and image encoding failures retain the text fallback.
+This setting affects the toolbox sidebar, separately from Fastfetch.

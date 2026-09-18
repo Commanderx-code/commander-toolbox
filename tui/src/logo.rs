@@ -30,14 +30,37 @@ pub struct Logo {
     last_area_size: (u16, u16),
 }
 
+// Konsole supports iTerm inline images from 22.04. The library blacklists
+// its Kitty/Sixel implementations but does not infer iTerm from KONSOLE_VERSION.
+fn prefer_konsole_iterm(version: Option<&str>, multiplexed: bool) -> bool {
+    !multiplexed
+        && version
+            .and_then(|value| value.parse::<u32>().ok())
+            .is_some_and(|version| version >= 220400)
+}
+
+fn image_picker() -> Picker {
+    let mut picker = Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
+    let version = std::env::var("KONSOLE_VERSION").ok();
+    let term = std::env::var("TERM").unwrap_or_default();
+    let multiplexed = std::env::var_os("TMUX").is_some()
+        || std::env::var_os("STY").is_some()
+        || term.starts_with("screen")
+        || term.starts_with("tmux");
+    if prefer_konsole_iterm(version.as_deref(), multiplexed) {
+        picker.set_protocol_type(ProtocolType::Iterm2);
+    }
+    picker.set_background_color(Some([0, 0, 0, 0]));
+    picker
+}
+
 impl Logo {
     pub fn load() -> Option<Self> {
         let dyn_image = image::load_from_memory(include_bytes!("../assets/ctt_logo.png")).ok()?;
         let rgba = dyn_image.to_rgba8();
         let image_size = rgba.dimensions();
 
-        let mut picker = Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
-        picker.set_background_color(Some([0, 0, 0, 0]));
+        let picker = image_picker();
         let font_size = picker.font_size();
         let font_size = (font_size.width, font_size.height);
         let renderer = if picker.protocol_type() == ProtocolType::Halfblocks {
@@ -225,11 +248,7 @@ impl Logo {
             return;
         }
 
-        let mut picker = match Picker::from_query_stdio() {
-            Ok(picker) => picker,
-            Err(_) => return,
-        };
-        picker.set_background_color(Some([0, 0, 0, 0]));
+        let picker = image_picker();
         let new_font_size = picker.font_size();
         let new_font_size = (new_font_size.width, new_font_size.height);
         let protocol_type = picker.protocol_type();
@@ -258,5 +277,21 @@ impl Logo {
         }
         let scaled = (u32::from(width) * LOGO_SCALE_NUM + (LOGO_SCALE_DEN / 2)) / LOGO_SCALE_DEN;
         scaled.clamp(1, u16::MAX as u32) as u16
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn konsole_uses_iterm_only_for_supported_direct_sessions() {
+        for version in ["220400", "240201", "250403", "260801"] {
+            assert!(prefer_konsole_iterm(Some(version), false));
+            assert!(!prefer_konsole_iterm(Some(version), true));
+        }
+        for version in [None, Some(""), Some("invalid"), Some("211203")] {
+            assert!(!prefer_konsole_iterm(version, false));
+        }
     }
 }
