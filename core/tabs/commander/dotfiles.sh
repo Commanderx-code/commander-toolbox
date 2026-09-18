@@ -9,7 +9,7 @@ case "$component" in
     *) printf '%s\n' 'Choose a component from the Dotfiles submenu.' >&2; exit 1 ;;
 esac
 if [ "$component" = fastfetch ]; then
-    confirm 'Install your Fastfetch configuration, distro PNG launcher and shell shortcut with backups. Fastfetch will be installed if missing, together with ImageMagick image support.'
+    confirm 'Install your Fastfetch configuration, configured PNG launcher and shell shortcut with backups. Fastfetch will be installed if missing, together with ImageMagick image support.'
     # shellcheck source=core/tabs/commander/fastfetch-support.sh
     . ./fastfetch-support.sh
     install_fastfetch_support

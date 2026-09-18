@@ -80,10 +80,11 @@ has not been validated on real hardware across the supported distros.
   `ImageMagick` and `ImageMagick-libs` on Fedora), installs Fastfetch if missing,
   and checks the selected binary for ImageMagick backend support. Direct PNG
   protocols can work without that compiled backend; Sixel/encoded Kitty need it.
-  The installer also installs a user launcher and shell shortcut that detect the distro
-  on every run and select a real PNG. Bundled logos cover Arch, Debian, Fedora,
-  Ubuntu, Mint, openSUSE and Gentoo; Garuda uses your dotfiles image. Other distros
-  use their system-provided PNG when available, otherwise a generic Linux PNG.
+  The installer copies the pinned dotfiles layout: labeled colored boxes, a Board
+  row, Pac-Man colors, the Arch PNG, and both Revan images as optional backups.
+  A user launcher and shell shortcut preserve the configured PNG and select a
+  compatible terminal protocol. If that image is missing, the launcher falls back
+  to a distro PNG (or a generic Linux PNG for an unrecognized distribution).
   No image download is needed at runtime. Kitty/Ghostty use Kitty graphics,
   Konsole/WezTerm use iTerm graphics, and Foot/MLTerm use Sixel. Terminals without
   a recognized image protocol show the details without an ASCII logo.

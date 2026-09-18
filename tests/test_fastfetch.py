@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -18,6 +19,32 @@ configure = load('configure', 'configure.py')
 
 
 class FastfetchTests(unittest.TestCase):
+    def test_install_and_launcher_keep_arch_png_in_custom_config_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            source = home / 'source'
+            (source / 'png').mkdir(parents=True)
+            (source / 'visuals').mkdir()
+            (source / 'visuals/dr460nized-fastfetch.png').write_bytes(b'garuda')
+            for name in ('arch.png', 'revan.png', 'revan-red-saber.png'):
+                (source / 'png' / name).write_bytes(b'PNG fixture ' + name.encode())
+            modules = [{'type': 'board', 'key': 'Board'}]
+            (source / 'config.jsonc').write_text(json.dumps({
+                'logo': {'type': 'kitty', 'source': '~/.config/fastfetch/png/arch.png'},
+                'modules': modules}))
+            config = home / 'custom config'
+            with patch.object(Path, 'home', return_value=home), patch.dict(os.environ, SHELL='/bin/fish'):
+                configure.install_fastfetch(source, config)
+            settings = json.loads((config / 'fastfetch/config.jsonc').read_text())
+            image = config / 'fastfetch/png/arch.png'
+            self.assertEqual(settings['logo']['source'], str(image))
+            self.assertEqual(settings['modules'], modules)
+            self.assertEqual(image.read_bytes(), (source / 'png/arch.png').read_bytes())
+            for name in ('revan.png', 'revan-red-saber.png'):
+                self.assertTrue((image.parent / name).is_file())
+            args = runtime.logo_arguments([], {'KONSOLE_VERSION': '1'}, config / 'fastfetch/commander-logos')
+            self.assertEqual(args, ['--logo', str(image), '--logo-type', 'iterm', '--logo-width', '24'])
+
     def test_distros_select_distinct_real_pngs(self):
         logos = ROOT / 'core/tabs/commander/fastfetch-logos'
         for distro in ('debian', 'fedora', 'arch', 'ubuntu', 'linuxmint', 'gentoo'):

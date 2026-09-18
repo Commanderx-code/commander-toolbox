@@ -201,18 +201,16 @@ def install_fastfetch(source, config):
         shutil.copytree(resources / 'fastfetch-logos', logos)
         shutil.copy2(source / 'visuals/dr460nized-fastfetch.png', logos / 'garuda.png')
         path = stage / 'config.jsonc'
-        text, count = re.subn(r'("logo"\s*:\s*)\{[^{}]*\}',
-                             lambda match: match[1] + json.dumps({'type': 'none', 'width': 24, 'height': 12}),
-                             path.read_text(), count=1)
-        if count != 1:
-            raise ValueError('Could not locate the Fastfetch logo configuration.')
-        path.write_text(text)
+        settings = json.loads(path.read_text())
+        # Keep the selected PNG and resolve it inside the installed XDG tree.
+        settings['logo'] = {'type': 'none', 'source': str(destination / 'png/arch.png'), 'width': 24}
+        path.write_text(json.dumps(settings, ensure_ascii=False, indent=4) + '\n')
         deploy(stage, destination)
     deploy(resources / 'fastfetch-distro.py', launcher)
     launcher.chmod(0o755)
     if not shell_config.exists() or shell_config.read_text() != shell_text:
         deploy(None, shell_config, shell_text)
-    print('Installed distro PNG launcher: ' + str(launcher))
+    print('Installed Fastfetch PNG launcher: ' + str(launcher))
     print('Open a new terminal to activate the fastfetch shell shortcut.')
     print('PNG logos: Kitty/Ghostty, Konsole/WezTerm/iTerm, or Sixel terminals. Other terminals show details without a logo.')
 
