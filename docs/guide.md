@@ -85,6 +85,7 @@ has not been validated on real hardware across the supported distros.
   A user launcher and shell shortcut select the current distro PNG on every run
   and choose a compatible terminal protocol. The layout stays the same across
   distros; an unrecognized distribution uses a system-provided or generic Linux PNG.
+  Zorin uses its bundled official blue PNG logomark.
   No image download is needed at runtime. Kitty/Ghostty use Kitty graphics,
   Konsole/WezTerm use iTerm graphics, and Foot/MLTerm use Sixel. Terminals without
   a recognized image protocol show the details without an ASCII logo.

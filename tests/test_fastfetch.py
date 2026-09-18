@@ -46,7 +46,7 @@ class FastfetchTests(unittest.TestCase):
             # Even a leftover hardcoded Arch logo must not override distro detection.
             settings['logo']['source'] = str(image)
             (config / 'fastfetch/config.jsonc').write_text(json.dumps(settings))
-            for distro in ('fedora', 'debian', 'arch', 'ubuntu'):
+            for distro in ('fedora', 'debian', 'arch', 'ubuntu', 'zorin'):
                 with patch.object(runtime, 'read_os_release', return_value={'ID': distro}):
                     args = runtime.logo_arguments([], {'KONSOLE_VERSION': '1'}, logos)
                 self.assertEqual(args, ['--logo', str(logos / (distro + '.png')),
@@ -54,7 +54,7 @@ class FastfetchTests(unittest.TestCase):
 
     def test_distros_select_distinct_real_pngs(self):
         logos = ROOT / 'core/tabs/commander/fastfetch-logos'
-        for distro in ('debian', 'fedora', 'arch', 'ubuntu', 'linuxmint', 'gentoo'):
+        for distro in ('debian', 'fedora', 'arch', 'ubuntu', 'linuxmint', 'gentoo', 'zorin'):
             logo = runtime.distro_logo({'ID': distro}, logos)
             self.assertEqual(logo.name, distro + '.png')
             self.assertEqual(logo.read_bytes()[:8], b'\x89PNG\r\n\x1a\n')
