@@ -294,9 +294,15 @@ The TUI must provide:
 - A warning when Linutil itself is run as root unless explicitly bypassed.
 - A minimum-size check with an explicit bypass option.
 
-Raw and local commands selected together execute in selection order within one
-shell program. A failure must be visible to the user and reflected in the final
-command status.
+Raw and local commands selected together execute in selection order in isolated
+subshells. A failed action stops the queue and is reflected in the final status.
+Action names and per-action statuses are stored under the user's private
+`$XDG_STATE_HOME/commander-toolbox/history` (default `~/.local/state`). Pending
+actions remain distinguishable from completed ones. A still-running marker after
+an interrupted session is not success. Set `COMMANDER_TOOLBOX_HISTORY=0` to opt out.
+Terminal output is saved only when explicitly requested with L; history does not
+record keystrokes, passwords or command bodies. Saved output can contain private
+information and is readable only by the user by default.
 
 ## 8. Configuration and automation
 

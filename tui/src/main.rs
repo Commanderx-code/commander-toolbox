@@ -4,6 +4,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod history;
 mod logo;
 mod root;
 mod running_command;

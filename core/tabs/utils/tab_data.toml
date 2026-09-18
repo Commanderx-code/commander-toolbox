@@ -1,6 +1,38 @@
 name = "Utilities"
 
 [[data]]
+name = "Toolbox Maintenance"
+multi_select = false
+
+[[data.entries]]
+name = "System Diagnostics"
+description = "Inspect GPU drivers, OpenCL/Vulkan, Secure Boot, disk space and virtualization. Missing tools are reported, not installed. Optionally save a private report."
+script = "../commander/tools-diagnostics.sh"
+task_list = "FM"
+multi_select = false
+
+[[data.entries]]
+name = "Config Backup Restore"
+description = "Browse Commander user-configuration backups and restore one, backing up the current configuration first. Symlink-managed configurations and system boot files are excluded."
+script = "../commander/tools-backups.sh"
+task_list = "FM"
+multi_select = false
+
+[[data.entries]]
+name = "Toolbox Updater"
+description = "Show the checkout revision, fetch origin/main and build a fast-forward update. Refuses local edits and diverged branches; optionally installs the user executable with a backup."
+script = "../commander/tools-update.sh"
+task_list = "FM"
+multi_select = false
+
+[[data.entries]]
+name = "Installation History"
+description = "Browse recorded action names and exit results. View output logs explicitly saved with L after commands finish. History starts with this version."
+script = "../commander/tools-history.sh"
+task_list = ""
+multi_select = false
+
+[[data]]
 name = "Monitor Control"
 multi_select = false
 
@@ -83,6 +115,18 @@ name = "CUPS"
 script = "printers/install-cups.sh"
 description = "This script will install the CUPS system, required for most printer drivers on Linux."
 task_list = "I"
+
+[[data.entries]]
+name = "Driverless Printer Setup"
+script = "../commander/printer-driverless.sh"
+description = "Install CUPS and network discovery, enable their services and add a compatible IPP Everywhere printer. Supports Fedora, Arch and Debian/Ubuntu on systemd; preserves existing queues."
+task_list = "I MP SS PFM"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["systemctl"]
 
 [[data.entries]]
 name = "Epson printer drivers"

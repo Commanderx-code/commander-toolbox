@@ -22,6 +22,7 @@
 - **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
 - **DaVinci Resolve - Native**: Install DaVinci Resolve using Native on Fedora or Arch-family Linux. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations.
 - **DaVinci Resolve - Davincibox**: Install DaVinci Resolve using Davincibox on Fedora, Arch, Debian, Ubuntu or their supported derivatives. Requires the official extracted Linux .run installer and a working GPU driver. Installs dependencies and a compatibility launcher; Free or licensed Studio. See docs/resolve.md for requirements and limitations.
+- **DaVinci Resolve Maintenance**: Check native/container dependencies, inspect the Resolve container, repair backed-up launchers or remove the dedicated container after confirmation. Includes native uninstall guidance.
 - **Darktable**: Darktable is a free and open-source photography application and raw developer.
 - **GNU Image Manipulation Program (GIMP)**: GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats.
 - **Handbrake**: HandBrake is a free and open-source transcoder for digital video files.
@@ -257,6 +258,13 @@ https://github.com/ChrisTitusTech/dwm-titus
 ## Utilities
 
 
+### Toolbox Maintenance
+
+- **System Diagnostics**: Inspect GPU drivers, OpenCL/Vulkan, Secure Boot, disk space and virtualization. Missing tools are reported, not installed. Optionally save a private report.
+- **Config Backup Restore**: Browse Commander user-configuration backups and restore one, backing up the current configuration first. Symlink-managed configurations and system boot files are excluded.
+- **Toolbox Updater**: Show the checkout revision, fetch origin/main and build a fast-forward update. Refuses local edits and diverged branches; optionally installs the user executable with a backup.
+- **Installation History**: Browse recorded action names and exit results. View output logs explicitly saved with L after commands finish. History starts with this version.
+
 ### Monitor Control
 
 - **Auto Detect Displays**: This script is designed to detect and apply recommended configuration for monitors connected with your system
@@ -275,6 +283,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### Printers
 
 - **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
+- **Driverless Printer Setup**: Install CUPS and network discovery, enable their services and add a compatible IPP Everywhere printer. Supports Fedora, Arch and Debian/Ubuntu on systemd; preserves existing queues.
 - **Epson printer drivers**: This script will install the Epson printer drivers.
 - **HP printer drivers**: This script will install HP printer drivers.
 

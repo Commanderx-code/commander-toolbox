@@ -97,6 +97,13 @@ data = "file_exists"
 values = ["/run/ostree-booted"]
 
 [[data.entries]]
+name = "DaVinci Resolve Maintenance"
+description = "Check native/container dependencies, inspect the Resolve container, repair backed-up launchers or remove the dedicated container after confirmation. Includes native uninstall guidance."
+script = "../commander/tools-resolve.sh"
+task_list = "FM RP"
+multi_select = false
+
+[[data.entries]]
 name = "Darktable"
 description = "Darktable is a free and open-source photography application and raw developer."
 script = "design-tools/darktable.sh"

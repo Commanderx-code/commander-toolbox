@@ -939,7 +939,12 @@ impl AppState {
             .map(|node| &node.command)
             .collect();
 
-        let command = RunningCommand::new(&commands);
+        let names: Vec<&str> = self
+            .selected_commands
+            .iter()
+            .map(|node| node.name.as_str())
+            .collect();
+        let command = RunningCommand::new(&commands, &names);
         self.spawn_float(command, FLOAT_SIZE, FLOAT_SIZE);
         self.selected_commands.clear();
     }

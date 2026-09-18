@@ -37,6 +37,8 @@ and confirm each installation before it runs.
 | **Boot and login themes** | Twelve GRUB themes, a plain GRUB restore option, and the Revan SDDM theme. |
 | **Video editing** | Native Resolve setup on Fedora/Arch, plus Davincibox on Debian/Ubuntu and derivatives, with dependency installation and a compatibility launcher. |
 | **Everyday maintenance** | A personalized Topgrade configuration and Debian Nala setup with an interactive `apt` alias. |
+| **Recovery and diagnostics** | System reports, configuration backup restoration, toolbox updates and action history. |
+| **Network printing** | Driverless IPP Everywhere setup for compatible printers on Fedora, Arch and Debian/Ubuntu. |
 | **Security tools** | AppArmor setup on supported systems and SELinux tools for Fedora. |
 
 The wider Linutil application and system-tool catalog remains available alongside
@@ -125,6 +127,15 @@ Actual installation, GPU acceleration and playback still require hardware testin
 automated tests cover installer orchestration and launcher generation.
 
 [Resolve setup, requirements and troubleshooting →](docs/resolve.md)
+
+## Maintenance tools
+
+Open **Utilities → Toolbox Maintenance** for diagnostics, config backup restore,
+the toolbox updater and installation history. Driverless printing is under
+**Utilities → Printers**; Resolve maintenance is beside its installers in
+**Applications Setup → Design Tools**.
+
+[Maintenance and recovery guide →](docs/maintenance.md)
 
 ## Platform support
 

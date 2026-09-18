@@ -1,3 +1,4 @@
+use crate::history;
 use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
@@ -11,8 +12,10 @@ use ratatui::{
     widgets::Block,
 };
 use std::{
-    fs::File,
+    fs::OpenOptions,
     io::{Read, Result, Write},
+    os::unix::fs::OpenOptionsExt,
+    path::PathBuf,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc, Mutex,
@@ -39,6 +42,7 @@ pub struct RunningCommand {
     /// Only set after the process has ended
     status: Option<ExitStatus>,
     log_path: Option<String>,
+    history_path: Option<PathBuf>,
     scroll_offset: usize,
 }
 
@@ -193,7 +197,7 @@ impl FloatContent for RunningCommand {
 pub static TERMINAL_UPDATED: AtomicBool = AtomicBool::new(true);
 
 impl RunningCommand {
-    pub fn new(commands: &[&Command]) -> Self {
+    pub fn new(commands: &[&Command], names: &[&str]) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -208,28 +212,45 @@ impl RunningCommand {
         cmd.env("NO_COLOR", "");
 
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
+        let history_path = history::create(names);
+        cmd.env(
+            "COMMANDER_TOOLBOX_SOURCE",
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .unwrap_or(std::path::Path::new(".")),
+        );
         let mut script = String::new();
 
-        for command in commands {
+        for (index, command) in commands.iter().enumerate() {
+            let mut action = String::new();
             match command {
-                Command::Raw(prompt) => script.push_str(&format!("{prompt}\n")),
+                Command::Raw(prompt) => {
+                    action.push_str(&format!("sh -e -c {}\n", history::quote(prompt)))
+                }
                 Command::LocalFile {
                     executable,
                     args,
                     file,
                 } => {
                     if let Some(parent_directory) = file.parent() {
-                        script.push_str(&format!("cd {}\n", parent_directory.display()));
+                        action.push_str(&format!(
+                            "cd {} || exit\n",
+                            history::quote(&parent_directory.to_string_lossy())
+                        ));
                     }
-                    script.push_str(executable);
+                    action.push_str(&history::quote(executable));
                     for arg in args {
-                        script.push(' ');
-                        script.push_str(arg);
+                        action.push(' ');
+                        action.push_str(&history::quote(arg));
                     }
-                    script.push('\n'); // Ensures that each command is properly separated for execution preventing directory errors
+                    action.push('\n');
                 }
                 Command::None => panic!("Command::None was treated as a command"),
             }
+            let status = history_path
+                .as_ref()
+                .map(|path| path.join(format!("{index:04}.status")));
+            script.push_str(&history::wrap(&action, status.as_deref()));
         }
 
         cmd.arg(script);
@@ -299,6 +320,7 @@ impl RunningCommand {
             writer,
             status: None,
             log_path: None,
+            history_path,
             scroll_offset: 0,
         }
     }
@@ -355,6 +377,16 @@ impl RunningCommand {
     }
 
     fn save_log(&self) -> Result<String> {
+        if let Some(path) = &self.history_path {
+            let log = path.join("output.log");
+            let mut file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .mode(0o600)
+                .open(&log)?;
+            file.write_all(&self.buffer.lock().unwrap())?;
+            return Ok(log.to_string_lossy().into_owned());
+        }
         let mut log_path = std::env::temp_dir();
         let date_format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
         log_path.push(format!(
@@ -365,7 +397,11 @@ impl RunningCommand {
                 .unwrap()
         ));
 
-        let mut file = File::create(&log_path)?;
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&log_path)?;
         let buffer = self.buffer.lock().unwrap();
         file.write_all(&buffer)?;
 
