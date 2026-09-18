@@ -423,7 +423,7 @@ multi_select = false
 
 [[data.entries]]
 name = "Commander Fastfetch Config"
-description = "Install your Fastfetch configuration, Arch PNG logo and terminal-aware launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal."
+description = "Install your Fastfetch layout, automatic distro PNG logo and terminal-aware launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal."
 script = "../commander/dotfiles-fastfetch.sh"
 task_list = "I FM MP"
 multi_select = false

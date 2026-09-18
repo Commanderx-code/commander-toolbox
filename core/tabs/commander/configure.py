@@ -202,8 +202,8 @@ def install_fastfetch(source, config):
         shutil.copy2(source / 'visuals/dr460nized-fastfetch.png', logos / 'garuda.png')
         path = stage / 'config.jsonc'
         settings = json.loads(path.read_text())
-        # Keep the selected PNG and resolve it inside the installed XDG tree.
-        settings['logo'] = {'type': 'none', 'source': str(destination / 'png/arch.png'), 'width': 24}
+        # Keep the layout; the launcher chooses the distro PNG at runtime.
+        settings['logo'] = {'type': 'none', 'width': 24}
         path.write_text(json.dumps(settings, ensure_ascii=False, indent=4) + '\n')
         deploy(stage, destination)
     deploy(resources / 'fastfetch-distro.py', launcher)

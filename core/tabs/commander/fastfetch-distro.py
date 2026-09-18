@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # Commander Linutil distro PNG launcher
-"""Render the configured PNG with a terminal-compatible protocol, or use a distro fallback."""
+"""Render the current distro PNG with a terminal-compatible protocol."""
 import os
-import json
 from pathlib import Path
 import re
 import shlex
@@ -79,18 +78,7 @@ def logo_arguments(arguments, env, logos):
     if any(arg.split('=', 1)[0] in overrides for arg in arguments):
         return []
     protocol = image_protocol(env)
-    logo = None
-    try:
-        settings = json.loads((logos.parent / 'config.jsonc').read_text())
-        source = settings.get('logo', {}).get('source')
-        if isinstance(source, str):
-            candidate = Path(source).expanduser()
-            if candidate.is_file():
-                logo = candidate
-    except (OSError, ValueError, AttributeError):
-        pass
-    if logo is None:
-        logo = distro_logo(read_os_release(), logos)
+    logo = distro_logo(read_os_release(), logos)
     if protocol == 'none' or not logo.is_file():
         return ['--logo-type', 'none']
     return ['--logo', str(logo), '--logo-type', protocol, '--logo-width', '24']

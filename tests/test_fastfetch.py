@@ -19,7 +19,7 @@ configure = load('configure', 'configure.py')
 
 
 class FastfetchTests(unittest.TestCase):
-    def test_install_and_launcher_keep_arch_png_in_custom_config_directory(self):
+    def test_new_layout_keeps_distro_selection_in_custom_config_directory(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             source = home / 'source'
@@ -37,13 +37,20 @@ class FastfetchTests(unittest.TestCase):
                 configure.install_fastfetch(source, config)
             settings = json.loads((config / 'fastfetch/config.jsonc').read_text())
             image = config / 'fastfetch/png/arch.png'
-            self.assertEqual(settings['logo']['source'], str(image))
+            self.assertNotIn('source', settings['logo'])
             self.assertEqual(settings['modules'], modules)
             self.assertEqual(image.read_bytes(), (source / 'png/arch.png').read_bytes())
             for name in ('revan.png', 'revan-red-saber.png'):
                 self.assertTrue((image.parent / name).is_file())
-            args = runtime.logo_arguments([], {'KONSOLE_VERSION': '1'}, config / 'fastfetch/commander-logos')
-            self.assertEqual(args, ['--logo', str(image), '--logo-type', 'iterm', '--logo-width', '24'])
+            logos = config / 'fastfetch/commander-logos'
+            # Even a leftover hardcoded Arch logo must not override distro detection.
+            settings['logo']['source'] = str(image)
+            (config / 'fastfetch/config.jsonc').write_text(json.dumps(settings))
+            for distro in ('fedora', 'debian', 'arch', 'ubuntu'):
+                with patch.object(runtime, 'read_os_release', return_value={'ID': distro}):
+                    args = runtime.logo_arguments([], {'KONSOLE_VERSION': '1'}, logos)
+                self.assertEqual(args, ['--logo', str(logos / (distro + '.png')),
+                                        '--logo-type', 'iterm', '--logo-width', '24'])
 
     def test_distros_select_distinct_real_pngs(self):
         logos = ROOT / 'core/tabs/commander/fastfetch-logos'

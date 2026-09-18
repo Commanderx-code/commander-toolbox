@@ -86,7 +86,7 @@ https://github.com/ChrisTitusTech/neovim
 ### Dotfiles
 
 - **Commander Neovim Config**: Install your Neovim configuration from dotfiles with a backup of existing files. Install the application separately.
-- **Commander Fastfetch Config**: Install your Fastfetch configuration, Arch PNG logo and terminal-aware launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal.
+- **Commander Fastfetch Config**: Install your Fastfetch layout, automatic distro PNG logo and terminal-aware launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal.
 - **Commander Starship Config**: Install your Starship configuration from dotfiles with a backup of existing files. Install the application separately.
 - **Commander Konsole Config**: Install your Konsole configuration from dotfiles with a backup of existing files. Install the application separately.
 - **Commander Ghostty Profile Config**: Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately.

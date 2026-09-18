@@ -82,9 +82,9 @@ has not been validated on real hardware across the supported distros.
   protocols can work without that compiled backend; Sixel/encoded Kitty need it.
   The installer copies the pinned dotfiles layout: labeled colored boxes, a Board
   row, Pac-Man colors, the Arch PNG, and both Revan images as optional backups.
-  A user launcher and shell shortcut preserve the configured PNG and select a
-  compatible terminal protocol. If that image is missing, the launcher falls back
-  to a distro PNG (or a generic Linux PNG for an unrecognized distribution).
+  A user launcher and shell shortcut select the current distro PNG on every run
+  and choose a compatible terminal protocol. The layout stays the same across
+  distros; an unrecognized distribution uses a system-provided or generic Linux PNG.
   No image download is needed at runtime. Kitty/Ghostty use Kitty graphics,
   Konsole/WezTerm use iTerm graphics, and Foot/MLTerm use Sixel. Terminals without
   a recognized image protocol show the details without an ASCII logo.
