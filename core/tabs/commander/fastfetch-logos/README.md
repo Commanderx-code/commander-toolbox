@@ -1,6 +1,6 @@
 # PNG logo credits
 
-These PNGs come from https://github.com/ngeenx/operating-system-logos
+These PNG images come from https://github.com/ngeenx/operating-system-logos
 at commit `26fa244ed86397ccb62bb5e6e47b364768add2c6`, directory `src/128x128`.
 The upstream MIT license is included in LICENSE. Distribution marks remain
 owned by their respective owners.
