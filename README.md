@@ -17,6 +17,7 @@
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-you-get">Features</a> ·
+  <a href="#davinci-resolve">DaVinci Resolve</a> ·
   <a href="#platform-support">Platforms</a> ·
   <a href="docs/guide.md">Full guide</a> ·
   <a href="https://github.com/Commanderx-code/commander-toolbox/issues">Report an issue</a>
@@ -83,6 +84,7 @@ bootstrap scripts and package installers still target Linutil.
 
 | Open this menu | Choose your setup |
 | :--- | :--- |
+| **Applications Setup → Design Tools** | Choose native or Davincibox installation for DaVinci Resolve. |
 | **Applications Setup → Myfish Shell Setup** | Fish, Bash, Zsh or the guided installer. |
 | **Applications Setup → Dotfiles** | Install only the application configurations you want. |
 | **Applications Setup → Grub Theme** | Pick a theme or restore the plain GRUB menu. |
@@ -97,6 +99,31 @@ Tela and Vimix offer 1080p, 2K and 4K assets.
 Fastfetch chooses the distro logo each time it runs. PNG display requires an
 image-capable terminal and a compatible Fastfetch build. Reopen your terminal
 after installation. [Image support and configuration details →](docs/guide.md#configuration-ownership-and-portability)
+
+## DaVinci Resolve
+
+Choose **Applications Setup → Design Tools → DaVinci Resolve - Native** or
+**DaVinci Resolve - Davincibox**. Both target **Fedora and Arch-family Linux**
+on x86_64 systems.
+
+| Method | How it works |
+| :--- | :--- |
+| **Native** | Installs Resolve directly with distro-specific runtime and OpenCL packages. |
+| **Davincibox** | Builds a Fedora-based dependency container from pinned Davincibox source and runs Resolve through Distrobox. |
+
+Both provide GPU prerequisite checks, the GLib-family library launch workaround,
+Qt/XWayland settings, a missing-library check and a backed-up desktop launcher.
+The implementation draws on the supplied Resolve 21 Fedora walkthrough,
+[Chris Titus Tech's Resolve tools](https://github.com/ChrisTitusTech/resolve-linux)
+and [Davincibox](https://github.com/zelikos/davincibox).
+
+Download and extract Blackmagic's official Linux installer first; the toolbox
+asks for its `.run` file. A working host GPU driver is required, and Studio needs
+your own license. Existing installations are preserved rather than overwritten.
+Actual installation, GPU acceleration and playback still require hardware testing;
+automated tests cover installer orchestration and launcher generation.
+
+[Resolve setup, requirements and troubleshooting →](docs/resolve.md)
 
 ## Platform support
 
