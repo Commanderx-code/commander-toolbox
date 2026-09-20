@@ -31,7 +31,8 @@ this build with the stock application through the menu.
 | --- | --- | --- |
 | Applications Setup > Design Tools | DaVinci Resolve - Native / Davincibox | Install Resolve directly or in a dependency container on Fedora/Arch or Debian/Ubuntu; see the [Resolve guide](resolve.md). |
 | Applications Setup | Myfish Shell Setup | Open the submenu for native Fish, Bash or Zsh, or Guided Setup to choose the backend interactively. |
-| Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors or optional Ghostty profile, with backups. |
+| Applications Setup > Dotfiles | Zellij Terminal Sessions | Install Zellij if missing; create a Tokyo Night Storm/locked-mode preset only when no configuration exists. No shell reinstallation or automatic startup. |
+| Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, optional Ghostty profile or Zellij. Existing settings are backed up or preserved. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs your CachyOS-based theme while preserving current kernel/disk settings. |
 | Applications Setup | SDDM Theme | Installs the dedicated `sddm/` SilentSDDM Revan preset, previews it, then asks before activation. |
 | System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
@@ -49,6 +50,17 @@ Myfish and dotfiles are downloaded at explicit Git commit IDs recorded in
 `$XDG_DATA_HOME/commander-linutil/sources` (normally `~/.local/share/...`).
 Cached revisions and local edits are checked before reuse. Update the pins
 when adopting a reviewed revision of your repositories.
+
+The Zellij entry is embedded locally and does not depend on the Myfish source
+pin. The pinned Myfish installer remains unchanged until a new reviewed commit
+is published and pinned. Rebuild the Toolbox binary to include new menu entries.
+Zellij setup supports the same native package managers as the other custom
+installers; it stops with guidance when APT has no candidate, without adding
+repositories. Existing Zellij configurations, including Home Manager symlinks,
+are preserved. A new preset inherits your login shell and uses **Ctrl+G** to
+unlock/lock controls. When unlocked, **Ctrl+O**, then **d** detaches. Start with
+`zellij --session work` and reconnect with `zellij attach work`. Kitty image
+previews require Zellij 0.45 or newer; package versions vary by distribution.
 
 ## DaVinci Resolve
 

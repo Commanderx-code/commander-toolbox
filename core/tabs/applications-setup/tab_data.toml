@@ -411,7 +411,7 @@ multi_select = false
 
 [[data]]
 name = "Dotfiles"
-description = "Choose an individual configuration to install with backups. Fastfetch is installed when missing; other applications are installed separately. Symlink-managed files are preserved."
+description = "Choose an individual configuration. Fastfetch and Zellij are installed when missing; other applications are installed separately. Existing files are backed up or preserved, including symlink-managed settings."
 multi_select = false
 
 [[data.entries]]
@@ -446,6 +446,13 @@ multi_select = false
 name = "Commander Ghostty Profile Config"
 description = "Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately."
 script = "../commander/dotfiles-ghostty.sh"
+task_list = "I FM MP"
+multi_select = false
+
+[[data.entries]]
+name = "Zellij Terminal Sessions"
+description = "Install Zellij and create an optional Tokyo Night Storm preset. Preserve existing configuration; no automatic startup. Requires a distro package or an existing Zellij installation."
+script = "../commander/zellij.sh"
 task_list = "I FM MP"
 multi_select = false
 

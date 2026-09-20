@@ -1,3 +1,4 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
 Name=Commander Toolbox
 Comment=Distro-agnostic toolbox designed to simplify everyday Linux tasks

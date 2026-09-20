@@ -83,7 +83,8 @@ repos = [@DOTFILES_DIRECTORY@]
         )
         self.assertEqual(
             {entry['script'] for entry in menus['Dotfiles']['entries']},
-            {f'../commander/dotfiles-{component}.sh' for component in ('nvim', 'fastfetch', 'starship', 'konsole', 'ghostty')},
+            {f'../commander/dotfiles-{component}.sh' for component in ('nvim', 'fastfetch', 'starship', 'konsole', 'ghostty')}
+            | {'../commander/zellij.sh'},
         )
         for name in ('Myfish Shell Setup', 'Dotfiles'):
             self.assertNotIn('script', menus[name])
@@ -133,7 +134,7 @@ repos = [@DOTFILES_DIRECTORY@]
                         self.assertFalse(entry['multi_select'])
         for path in (ROOT / 'core/tabs').glob('*/tab_data.toml'):
             visit(tomllib.loads(path.read_text())['data'], path.parent)
-        self.assertEqual(len(found), 34)
+        self.assertEqual(len(found), 35)
 
 
 if __name__ == '__main__':
