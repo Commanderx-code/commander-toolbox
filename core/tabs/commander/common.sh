@@ -43,7 +43,7 @@ fetch_source() {
         grub-dracula) source_repo=dracula/grub; revision=0e721d99dbf0d5d6c4fd489b88248365b7a60d12 ;;
         grub-ctt) source_repo=ChrisTitusTech/bootloader-themes; revision=e3d1b5a3fce186000b628aaa12062cb31701842a ;;
         grub-vince) source_repo=vinceliuice/grub2-themes; revision=4c5a77125b93f833edc9bf7b14a899faa8ac79c6 ;;
-        Myfish) revision=c7015d5d5f4387e4851271590ee22c890d02c003 ;;
+        Myfish) revision=a86bdd5edb77d1f78b901b99dd6e51600dcc3704 ;;
         dotfiles) revision=d121c0c345f7ea42e9b1b5d702f4df38a83bb873 ;;
         *) exit 1 ;;
     esac
