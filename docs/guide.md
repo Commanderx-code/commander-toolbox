@@ -48,12 +48,18 @@ installed through the native package manager when missing.
 Myfish and dotfiles are downloaded at explicit Git commit IDs recorded in
 `core/tabs/commander/common.sh`. Downloads live under
 `$XDG_DATA_HOME/commander-linutil/sources` (normally `~/.local/share/...`).
-Cached revisions and local edits are checked before reuse. Update the pins
-when adopting a reviewed revision of your repositories.
+Cached revisions and local edits are checked before reuse. The source-sync
+workflow checks dotfiles and Myfish at minutes 17 and 47 each hour and adopts a
+repository's current `main` revision only after its `check.yml` push run succeeds.
+It imports `toolbox.json`, tests the generated catalog, builds the application,
+then commits the update and publishes a Linux x86_64 release. Failed or pending
+source checks retain the previous pin. [Automation and adding tools](source-sync.md).
 
 The Zellij entry is embedded locally and does not depend on the Myfish source
-pin. The pinned Myfish installer remains unchanged until a new reviewed commit
-is published and pinned. Rebuild the Toolbox binary to include new menu entries.
+pin. Myfish's installer follows its tested source pin automatically. Update or
+rebuild Toolbox to load new menu entries, then run the desired installer to apply
+configuration changes. Existing running binaries and user configs do not update
+in the background.
 Zellij setup supports the same native package managers as the other custom
 installers; it stops with guidance when APT has no candidate, without adding
 repositories. Existing Zellij configurations, including Home Manager symlinks,

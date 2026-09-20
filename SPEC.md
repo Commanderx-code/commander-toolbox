@@ -387,6 +387,33 @@ A utility is complete when:
 
 ## 12. Future compatibility
 
+### Source repository synchronization
+
+Dotfiles and Myfish export their installer menu in a versioned `toolbox.json`.
+The scheduled `sync-sources.yml` workflow adopts only the current `main` commit
+whose required `check.yml` push run has completed successfully. It keeps the
+previous source pin while that check is pending or failed. Source repositories
+are explicitly allowlisted; unrelated repositories are not imported.
+
+`scripts/sync-sources.py` validates the catalogs, pins exact commits in
+`core/tabs/commander/common.sh`, and regenerates the marked application submenus.
+Known `builtin` entries retain their dedicated installers. New `config` entries
+declare supported native package managers and tracked paths under XDG config;
+generated wrappers retain the normal APPLY confirmation and backup behavior.
+Absolute paths, traversal, overlapping targets, source symlinks and managed
+destination symlinks are rejected. Generic entries do not change services or
+boot settings. No source-provided shell text is interpolated into commands.
+
+Toolbox tests and the release build must succeed before automation commits or
+publishes an update. The same workflow publishes the build because bot-token
+pushes do not trigger a separate push workflow. Publication uses ordinary
+fast-forward pushes; concurrent human commits are never overwritten. A later
+run retries failed publication. Menus remain embedded at compile time, and
+applying configuration remains a user-selected action.
+
+Scheduled runs are best effort and can be disabled by GitHub after repository
+inactivity. Manual workflow dispatch is available for immediate checks.
+
 Architectural extensions should preserve the data-driven utility model.
 Potential additions such as richer capability detection, structured command
 results, dry-run support, per-command privilege declarations, or stronger

@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import tomllib
@@ -77,15 +78,10 @@ repos = [@DOTFILES_DIRECTORY@]
     def test_setup_menus_expose_choices_before_execution(self):
         catalog = tomllib.loads((ROOT / 'core/tabs/applications-setup/tab_data.toml').read_text())
         menus = {entry['name']: entry for entry in catalog['data']}
-        self.assertEqual(
-            {entry['name'] for entry in menus['Myfish Shell Setup']['entries']},
-            {'Myfish Fish (Native)', 'Myfish Bash (Native)', 'Myfish Zsh (Native)', 'Myfish Guided Setup'},
-        )
-        self.assertEqual(
-            {entry['script'] for entry in menus['Dotfiles']['entries']},
-            {f'../commander/dotfiles-{component}.sh' for component in ('nvim', 'fastfetch', 'starship', 'konsole', 'ghostty')}
-            | {'../commander/zellij.sh'},
-        )
+        for source, menu in [('Myfish', 'Myfish Shell Setup'), ('dotfiles', 'Dotfiles')]:
+            exported = json.loads((ROOT / 'core/tabs/commander/catalogs' / f'{source}.json').read_text())
+            self.assertEqual({entry['name'] for entry in menus[menu]['entries']},
+                             {entry['name'] for entry in exported['entries']})
         for name in ('Myfish Shell Setup', 'Dotfiles'):
             self.assertNotIn('script', menus[name])
             self.assertFalse(menus[name]['multi_select'])
@@ -129,12 +125,13 @@ repos = [@DOTFILES_DIRECTORY@]
                 if 'script' in entry:
                     path = (directory / entry['script']).resolve()
                     self.assertTrue(path.is_file(), str(path))
-                    if path.parent.name == 'commander':
+                    if (ROOT / 'core/tabs/commander') in path.parents:
                         found.add(entry['name'])
                         self.assertFalse(entry['multi_select'])
         for path in (ROOT / 'core/tabs').glob('*/tab_data.toml'):
             visit(tomllib.loads(path.read_text())['data'], path.parent)
-        self.assertEqual(len(found), 35)
+        self.assertIn('Zellij Terminal Sessions', found)
+        self.assertIn('Myfish Guided Setup', found)
 
 
 if __name__ == '__main__':

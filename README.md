@@ -185,3 +185,9 @@ and [Commander dotfiles](https://github.com/Commanderx-code/dotfiles).
 Downloaded themes and logos retain their own licenses;
 [theme sources and credits](docs/guide.md#additional-grub-theme-sources) are
 listed in the guide.
+
+## Automatic source updates
+
+Toolbox imports tested dotfiles and Myfish updates twice an hour, including new
+tools exported in their `toolbox.json` catalogs. It validates and publishes an
+updated Linux x86_64 build. [How synchronization works](docs/source-sync.md).
