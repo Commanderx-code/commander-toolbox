@@ -177,7 +177,8 @@ install_packages() { printf '%s\\n' "$@" > "$PACKAGE_LOG"; [ "$FAIL_PACKAGES" = 
         menu, _ = sync.render(documents)
         block = menu.split('name = "TFM trial"')[1]
         self.assertIn('task_list = "FM MP"', block)
-        self.assertIn('data = ["nix", "git"]', block)
+        self.assertIn('data = "command_exists"', block)
+        self.assertIn('values = ["nix", "git"]', block)
 
     def test_terminal_tools_confirm_and_preserve_existing_installations(self):
         for scenario in ('install', 'cancel', 'existing', 'wrong-arch', 'missing-nix', 'nix-failure'):

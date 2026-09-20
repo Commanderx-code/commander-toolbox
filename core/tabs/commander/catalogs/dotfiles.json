@@ -42,6 +42,27 @@
       "description": "Install Zellij and create an optional Tokyo Night Storm preset. Preserve existing configuration; no automatic startup. Requires a distro package or an existing Zellij installation.",
       "type": "builtin",
       "handler": "zellij"
+    },
+    {
+      "id": "netwatch",
+      "name": "NetWatch Network Dashboard",
+      "description": "Install pinned NetWatch through Nix on Linux x86_64. Ordinary monitoring is unprivileged; capture permissions remain a separate choice.",
+      "type": "builtin",
+      "handler": "netwatch"
+    },
+    {
+      "id": "tfm",
+      "name": "TFM Visual File Manager",
+      "description": "Install the pinned TFM beta through Nix on Linux x86_64, with preview and Wayland clipboard helpers. Use Ghostty for image previews.",
+      "type": "builtin",
+      "handler": "tfm"
+    },
+    {
+      "id": "cassette",
+      "name": "Cassette Spotify Player",
+      "description": "Install pinned Cassette and librespot through Nix on Linux x86_64. Requires Spotify Premium, your own Client ID and interactive browser login.",
+      "type": "builtin",
+      "handler": "cassette"
     }
   ]
 }

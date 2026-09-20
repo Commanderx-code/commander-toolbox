@@ -91,6 +91,9 @@ https://github.com/ChrisTitusTech/neovim
 - **Commander Konsole Config**: Install your Konsole configuration from dotfiles with a backup of existing files. Install the application separately.
 - **Commander Ghostty Profile Config**: Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately.
 - **Zellij Terminal Sessions**: Install Zellij and create an optional Tokyo Night Storm preset. Preserve existing configuration; no automatic startup. Requires a distro package or an existing Zellij installation.
+- **NetWatch Network Dashboard**: Install pinned NetWatch through Nix on Linux x86_64. Ordinary monitoring is unprivileged; capture permissions remain a separate choice.
+- **TFM Visual File Manager**: Install the pinned TFM beta through Nix on Linux x86_64, with preview and Wayland clipboard helpers. Use Ghostty for image previews.
+- **Cassette Spotify Player**: Install pinned Cassette and librespot through Nix on Linux x86_64. Requires Spotify Premium, your own Client ID and interactive browser login.
 
 ### Grub Theme
 

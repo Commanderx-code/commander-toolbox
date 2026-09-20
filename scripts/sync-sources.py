@@ -110,7 +110,7 @@ def render(documents):
                 [('name', entry['name']), ('description', entry['description']),
                  ('script', script), ('task_list', 'FM MP' if nix_tool else 'I FM MP')]) + '\nmulti_select = false\n')
             if nix_tool:
-                chunks.append('preconditions = [{ type = "command_exists", matches = true, data = ["nix", "git"] }]\n')
+                chunks.append('preconditions = [{ data = "command_exists", matches = true, values = ["nix", "git"] }]\n')
     return '\n'.join(chunks), wrappers
 
 
