@@ -11,7 +11,7 @@ from configure import check_destination, deploy
 
 BUILTINS = {
     'dotfiles': {'dotfiles-nvim', 'dotfiles-fastfetch', 'dotfiles-starship',
-                 'dotfiles-konsole', 'dotfiles-ghostty', 'zellij'},
+                 'dotfiles-konsole', 'dotfiles-ghostty', 'zellij', 'netwatch', 'tfm', 'cassette'},
     'Myfish': {'myfish', 'myfish-fish', 'myfish-bash', 'myfish-zsh'},
 }
 MANAGERS = {'apt-get', 'dnf', 'pacman'}

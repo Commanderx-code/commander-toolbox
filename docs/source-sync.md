@@ -39,6 +39,12 @@ is not atomic; earlier copied files retain their backups if a later copy fails.
 No shell commands can be embedded in a `config` entry. System services, boot changes
 and unusual installation procedures need a dedicated built-in Toolbox handler.
 
+NetWatch, TFM and Spotify Cassette have dedicated handlers using the pinned Nix
+packages exported by dotfiles. These entries need existing Nix and Git commands
+and run on Linux x86_64. They install into the user's Nix profile, preserve existing
+installations and leave authentication to the application. On the Commander
+workstation, Home Manager owns these tools; use `hm-rebuild` for package updates.
+
 See the source guides for the complete catalog example:
 
 - [Dotfiles publishing guide](https://github.com/Commanderx-code/dotfiles/blob/main/TOOLBOX.md)

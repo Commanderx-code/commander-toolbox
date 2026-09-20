@@ -70,6 +70,9 @@ def validate_checkout(source, root, document):
             'dotfiles-konsole': ['configs/konsole/Garuda.profile', 'configs/konsole/Sweet.colorscheme'],
             'dotfiles-ghostty': ['configs/ghostty/spotatui.conf'],
             'zellij': [],
+            'netwatch': ['home-manager/flake.nix', 'home-manager/terminal-tools.nix'],
+            'tfm': ['home-manager/flake.nix', 'home-manager/terminal-tools.nix'],
+            'cassette': ['home-manager/flake.nix', 'home-manager/terminal-tools.nix'],
         }
         for entry in entries:
             if entry['type'] == 'builtin':
@@ -101,10 +104,13 @@ def render(documents):
                 script = f'../commander/generated/{name}'
                 wrappers[name] = (f'#!/bin/sh -e\n# Generated from {source}/toolbox.json.\n'
                                   f'cd ..\nexec sh -e ./catalog-install.sh {source} {entry["id"]}\n')
+            nix_tool = entry.get('handler') in {'netwatch', 'tfm', 'cassette'}
             chunks.append('\n[[data.entries]]\n' + '\n'.join(
                 f'{key} = {json.dumps(value)}' for key, value in
                 [('name', entry['name']), ('description', entry['description']),
-                 ('script', script), ('task_list', 'I FM MP')]) + '\nmulti_select = false\n')
+                 ('script', script), ('task_list', 'FM MP' if nix_tool else 'I FM MP')]) + '\nmulti_select = false\n')
+            if nix_tool:
+                chunks.append('preconditions = [{ type = "command_exists", matches = true, data = ["nix", "git"] }]\n')
     return '\n'.join(chunks), wrappers
 
 

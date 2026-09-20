@@ -411,6 +411,12 @@ fast-forward pushes; concurrent human commits are never overwritten. A later
 run retries failed publication. Menus remain embedded at compile time, and
 applying configuration remains a user-selected action.
 
+NetWatch, TFM and Spotify Cassette use dedicated Nix installers backed by the
+source repository's checksummed Linux x86_64 packages. Their menu entries require
+Nix and Git. Installers validate architecture, retain APPLY confirmation, install
+into the user's Nix profile and preserve commands owned by an existing package
+manager. They never collect Spotify credentials or grant network capture privileges.
+
 Scheduled runs are best effort and can be disabled by GitHub after repository
 inactivity. Manual workflow dispatch is available for immediate checks.
 

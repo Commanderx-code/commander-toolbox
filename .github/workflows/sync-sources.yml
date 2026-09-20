@@ -61,8 +61,8 @@ jobs:
           rustup toolchain install stable --profile minimal
           rustup default stable
           python3 -B -m unittest discover -s tests -v
-          shellcheck core/tabs/commander/common.sh core/tabs/commander/catalog-install.sh
-          checkbashisms core/tabs/commander/catalog-install.sh
+          shellcheck core/tabs/commander/common.sh core/tabs/commander/catalog-install.sh core/tabs/commander/terminal-tool.sh core/tabs/commander/netwatch.sh core/tabs/commander/tfm.sh core/tabs/commander/cassette.sh
+          checkbashisms core/tabs/commander/catalog-install.sh core/tabs/commander/terminal-tool.sh core/tabs/commander/netwatch.sh core/tabs/commander/tfm.sh core/tabs/commander/cassette.sh
           cargo test --locked --no-fail-fast --package linutil_core
           cargo xtask docgen
           git diff --check
@@ -118,5 +118,5 @@ jobs:
           cargo test --locked --no-fail-fast --package linutil_core
           cargo xtask docgen
           git diff --exit-code
-          shellcheck core/tabs/commander/common.sh core/tabs/commander/catalog-install.sh
-          checkbashisms core/tabs/commander/catalog-install.sh
+          shellcheck core/tabs/commander/common.sh core/tabs/commander/catalog-install.sh core/tabs/commander/terminal-tool.sh core/tabs/commander/netwatch.sh core/tabs/commander/tfm.sh core/tabs/commander/cassette.sh
+          checkbashisms core/tabs/commander/catalog-install.sh core/tabs/commander/terminal-tool.sh core/tabs/commander/netwatch.sh core/tabs/commander/tfm.sh core/tabs/commander/cassette.sh

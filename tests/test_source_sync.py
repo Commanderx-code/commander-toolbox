@@ -170,6 +170,43 @@ install_packages() { printf '%s\\n' "$@" > "$PACKAGE_LOG"; [ "$FAIL_PACKAGES" = 
         stored = (ROOT / 'core/tabs/applications-setup/tab_data.toml').read_text()
         self.assertEqual(stored.split(sync.BEGIN)[1].split(sync.END)[0], '\n' + menu + '\n')
 
+    def test_nix_tools_are_filtered_and_do_not_claim_privileged_installation(self):
+        documents = {name: json.loads((sync.TOOLS / 'catalogs' / f'{name}.json').read_text()) for name in sync.SOURCES}
+        documents['dotfiles']['entries'] = [dict(id='tfm', name='TFM trial', description='Install TFM.',
+                                               type='builtin', handler='tfm')]
+        menu, _ = sync.render(documents)
+        block = menu.split('name = "TFM trial"')[1]
+        self.assertIn('task_list = "FM MP"', block)
+        self.assertIn('data = ["nix", "git"]', block)
+
+    def test_terminal_tools_confirm_and_preserve_existing_installations(self):
+        for scenario in ('install', 'cancel', 'existing', 'wrong-arch', 'missing-nix', 'nix-failure'):
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                shutil.copy2(sync.TOOLS / 'terminal-tool.sh', root / 'terminal-tool.sh')
+                (root / 'common.sh').write_text('''
+id() { printf '1000\\n'; }
+uname() { case "$1" in -s) printf 'Linux\\n';; -m) printf '%s\\n' "$TEST_ARCH";; esac; }
+checkCommandRequirements() { [ "$SCENARIO" != missing-nix ] || exit 1; }
+command_exists() { [ "$SCENARIO" = existing ]; }
+confirm() { read -r answer; [ "$answer" = APPLY ] || exit 1; }
+fetch_source() { printf '%s\\n' "$1" > "$FETCH_LOG"; source_dir='/tested/source with spaces'; }
+nix() { printf '%s\\n' "$@" > "$NIX_LOG"; [ "$SCENARIO" != nix-failure ]; }
+''')
+                result = subprocess.run(['sh', '-e', './terminal-tool.sh', 'tfm'], cwd=root,
+                                        input='no\n' if scenario == 'cancel' else 'APPLY\n',
+                                        capture_output=True, text=True,
+                                        env=dict(os.environ, SCENARIO=scenario,
+                                                 TEST_ARCH='aarch64' if scenario == 'wrong-arch' else 'x86_64',
+                                                 FETCH_LOG=str(root / 'fetch'), NIX_LOG=str(root / 'nix')))
+                self.assertEqual(result.returncode == 0, scenario in ('install', 'existing'), result.stderr)
+                self.assertEqual((root / 'fetch').exists(), scenario in ('install', 'nix-failure'))
+                self.assertEqual((root / 'nix').exists(), scenario in ('install', 'nix-failure'))
+                if scenario == 'install':
+                    self.assertEqual((root / 'nix').read_text().splitlines(),
+                                     ['--extra-experimental-features', 'nix-command flakes', 'profile',
+                                      'install', 'path:/tested/source with spaces?dir=home-manager#tfm'])
+
 
 if __name__ == '__main__':
     unittest.main()
