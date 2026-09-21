@@ -36,10 +36,10 @@ def eligible_revision(source, request=api):
     head = request(f'repos/{repo}/commits/main')['sha']
     if not re.fullmatch(r'[0-9a-f]{40}', head):
         raise ValueError('GitHub returned an invalid revision.')
-    query = urlencode({'branch': 'main', 'event': 'push', 'head_sha': head, 'per_page': 100})
+    query = urlencode({'branch': 'main', 'head_sha': head, 'per_page': 100})
     runs = request(f'repos/{repo}/actions/workflows/check.yml/runs?{query}')['workflow_runs']
     # Do not filter for success in the API: a newer failed rerun must veto an older success.
-    runs = [r for r in runs if r['head_sha'] == head and r['event'] == 'push'
+    runs = [r for r in runs if r['head_sha'] == head and r['event'] in ('push', 'workflow_dispatch')
             and r['head_branch'] == 'main' and r['head_repository']['full_name'] == repo]
     latest = max(runs, key=lambda r: (r['id'], r.get('run_attempt', 1)), default=None)
     if latest and latest['status'] == 'completed' and latest['conclusion'] == 'success':

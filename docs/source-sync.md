@@ -6,7 +6,7 @@ runs at minutes 17 and 47 of each hour, on Toolbox pushes to `main`, and through
 **Run workflow**. Scheduled runs can be delayed by GitHub.
 
 For each source it reads the current `main` commit, then checks that commit's
-`check.yml` push workflow. Only a completed successful run is accepted. A failed,
+`check.yml` push or explicitly dispatched workflow. Only a completed successful run is accepted. A failed,
 cancelled, missing or unfinished run leaves that source's previous pin in place;
 an API error fails the sync instead of selecting an unchecked version.
 
@@ -86,3 +86,9 @@ git diff --check
 Running `python3 -B scripts/sync-sources.py` without `--render` queries GitHub and
 updates source pins/catalogs in your checkout. It never commits, pushes, publishes
 or installs tools by itself. Review existing local changes before using it.
+
+Shared Fish functions originate in Myfish. Dotfiles imports them after Myfish CI
+passes and validates the combined configuration. Its bot dispatches `check.yml`
+explicitly because bot pushes do not trigger push workflows. Both validation
+events require the exact main-branch commit from the source repository; pull
+request checks cannot advance source pins.

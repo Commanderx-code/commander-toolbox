@@ -432,3 +432,11 @@ Confirmation dialogs show the selected commands and separate, visible body rows
 for [Y] Run / Install and [N] Cancel. Actions must remain readable at the minimum
 supported terminal size rather than being clipped within the popup border.
 Existing confirmation keys and skip-confirmation behavior remain unchanged.
+
+## Shared Fish source validation
+
+Myfish owns portable Fish functions. Dotfiles imports tested revisions while
+preserving documented workstation overrides. Source synchronization accepts
+successful `check.yml` push or workflow_dispatch runs for the exact main commit
+and source repository; the newest failed or unfinished matching run vetoes older
+successes. This supports explicit validation after automated dotfiles commits.

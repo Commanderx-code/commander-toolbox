@@ -46,6 +46,12 @@ class SourceSyncTests(unittest.TestCase):
             with self.subTest(runs=bad):
                 self.assertIsNone(sync.eligible_revision('dotfiles', self.request(bad)))
 
+    def test_dispatched_validation_accepts_bot_commits_and_newer_failure_vetoes(self):
+        good = self.run_record(event='workflow_dispatch')
+        self.assertEqual(sync.eligible_revision('dotfiles', self.request([good])), 'a' * 40)
+        bad = self.run_record(id=2, event='workflow_dispatch', conclusion='failure')
+        self.assertIsNone(sync.eligible_revision('dotfiles', self.request([good, bad])))
+
     def test_source_errors_do_not_fall_back_to_untested_head(self):
         with self.assertRaises(OSError):
             sync.eligible_revision('dotfiles', lambda _: (_ for _ in ()).throw(OSError('offline')))
