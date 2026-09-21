@@ -44,7 +44,7 @@ fetch_source() {
         grub-ctt) source_repo=ChrisTitusTech/bootloader-themes; revision=e3d1b5a3fce186000b628aaa12062cb31701842a ;;
         grub-vince) source_repo=vinceliuice/grub2-themes; revision=4c5a77125b93f833edc9bf7b14a899faa8ac79c6 ;;
         Myfish) revision=24bd2d42c197eb34812327c7b9760383d5fa0390 ;;
-        dotfiles) revision=4cc78a3b5cca499cf3ae4bb87bf4fcc60d8ec791 ;;
+        dotfiles) revision=4de84b7aca578af9b8b8ae5ab2a64c4a23f500d6 ;;
         *) exit 1 ;;
     esac
     source_base="${XDG_DATA_HOME:-$HOME/.local/share}/commander-linutil/sources"
