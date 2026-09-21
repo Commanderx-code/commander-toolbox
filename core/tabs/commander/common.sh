@@ -43,8 +43,8 @@ fetch_source() {
         grub-dracula) source_repo=dracula/grub; revision=0e721d99dbf0d5d6c4fd489b88248365b7a60d12 ;;
         grub-ctt) source_repo=ChrisTitusTech/bootloader-themes; revision=e3d1b5a3fce186000b628aaa12062cb31701842a ;;
         grub-vince) source_repo=vinceliuice/grub2-themes; revision=4c5a77125b93f833edc9bf7b14a899faa8ac79c6 ;;
-        Myfish) revision=a86bdd5edb77d1f78b901b99dd6e51600dcc3704 ;;
-        dotfiles) revision=d0a445879c5cbc4e6ed96148acd503b33efce71e ;;
+        Myfish) revision=1e528d234540cb1079e626d2d351b8607512c336 ;;
+        dotfiles) revision=84fb7f91af960802a6afd1a7c79329bc1e8fba69 ;;
         *) exit 1 ;;
     esac
     source_base="${XDG_DATA_HOME:-$HOME/.local/share}/commander-linutil/sources"
