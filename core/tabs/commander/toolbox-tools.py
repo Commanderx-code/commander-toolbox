@@ -162,38 +162,47 @@ def history():
     print(safe_text(log.read_text(errors='replace')))
 
 
+def git_command(repo, *args):
+    # The checkout path is user-supplied: never let repository-local config or
+    # hooks run commands (fsmonitor on status, post-merge on fast-forward).
+    return ['git', '-c', 'core.fsmonitor=false', '-c', 'core.hooksPath=/dev/null', '-C', str(repo), *args]
+
+
 def git(repo, *args):
-    return run(['git', '-C', str(repo), *args], capture=True).stdout.strip()
+    return run(git_command(repo, *args), capture=True).stdout.strip()
 
 
 def update_checkout(repo):
     repo = Path(repo).expanduser().resolve()
     if Path(git(repo, 'rev-parse', '--show-toplevel')) != repo:
         raise ValueError('Choose the repository root.')
-    if git(repo, 'status', '--porcelain', '--untracked-files=all'):
-        raise ValueError('Local changes found. Commit or stash them yourself before updating; nothing was discarded.')
-    branch = git(repo, 'symbolic-ref', '--quiet', '--short', 'HEAD')
     remote = git(repo, 'remote', 'get-url', 'origin')
     allowed = ('https://github.com/Commanderx-code/commander-toolbox.git',
                'https://github.com/Commanderx-code/commander-toolbox',
                'git@github.com:Commanderx-code/commander-toolbox.git')
     if remote not in allowed:
         raise ValueError('origin is not Commanderx-code/commander-toolbox. Update custom forks manually.')
+    if git(repo, 'status', '--porcelain', '--untracked-files=all'):
+        raise ValueError('Local changes found. Commit or stash them yourself before updating; nothing was discarded.')
+    branch = git(repo, 'symbolic-ref', '--quiet', '--short', 'HEAD')
     print(f'Checkout: {repo}\nBranch: {branch}\nCurrent revision: {git(repo, "rev-parse", "--short", "HEAD")}\nRemote: {remote}')
     confirm('Fetch origin/main, fast-forward this checkout and build the release executable?')
-    run(['git', '-C', str(repo), 'fetch', 'origin', 'main'])
-    if run(['git', '-C', str(repo), 'merge-base', '--is-ancestor', 'HEAD', 'origin/main'], check=False).returncode:
+    run(git_command(repo, 'fetch', 'origin', 'main'))
+    if run(git_command(repo, 'merge-base', '--is-ancestor', 'HEAD', 'origin/main'), check=False).returncode:
         raise ValueError('Local commits are ahead of or diverged from origin/main. Nothing was reset or merged.')
-    run(['git', '-C', str(repo), 'merge', '--ff-only', 'origin/main'])
+    run(git_command(repo, 'merge', '--ff-only', 'origin/main'))
     try:
         run(['cargo', 'build', '--locked', '--release', '--package', 'linutil_tui', '--target-dir', str(repo / 'target')], cwd=repo)
     except subprocess.CalledProcessError:
         raise ValueError('Checkout updated, but the build failed. Your installed executable was not replaced. Fix the build and retry.') from None
+    binary = repo / 'target/release/commander-toolbox'
+    # Ignored build output is not covered by the clean-checkout check; refuse a redirected target directory.
+    check_destination(binary)
     directory = state_dir()
     check_destination(directory / 'checkout')
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     (directory / 'checkout').write_text(str(repo))
-    return repo / 'target/release/commander-toolbox'
+    return binary
 
 
 def updater():
