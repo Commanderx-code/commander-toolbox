@@ -137,6 +137,40 @@ exec "$@"
                 self.run_installer(mode='container', distro=distro)
                 self.run_installer(mode='container', distro=distro, gpu='1')
 
+    def run_apt_helper(self, root, sources, keys, key_fpr='C95B321B61E88C1809C4F759DDCAE044F796ECB0'):
+        helper = (TOOLS / 'resolve-apt.sh').read_text().replace('/etc/apt/sources.list.d', str(sources)).replace('/usr/share/keyrings', str(keys))
+        (root / 'helper.sh').write_text(helper)
+        (root / 'run.sh').write_text('''#!/bin/sh -e
+ESCALATION_TOOL=env
+confirm() { :; }
+install_packages() { :; }
+backup_system() { :; }
+curl() { printf 'test key' > "$4"; }
+gpg() {
+    case "$3" in
+        --show-keys) printf 'pub:-:4096:1:DDCAE044F796ECB0:::\\nfpr:::::::::%s:\\n' "$KEY_FPR" ;;
+        --dearmor) cp "$6" "$5" ;;
+    esac
+}
+. ./helper.sh
+resolve_apt_nvidia
+''')
+        (root / 'apt-get').write_text('#!/bin/sh\nexit 0\n')
+        (root / 'apt-get').chmod(0o755)
+        env = dict(os.environ, PATH=str(root) + ':' + os.environ['PATH'], KEY_FPR=key_fpr)
+        return subprocess.run(['sh', '-e', './run.sh'], cwd=root, env=env, capture_output=True, text=True)
+
+    def test_apt_nvidia_repository_rejects_unpinned_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sources, keys = root / 'sources', root / 'keys'
+            sources.mkdir()
+            keys.mkdir()
+            result = self.run_apt_helper(root, sources, keys, key_fpr='0' * 40)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('fingerprint mismatch', result.stderr)
+            self.assertEqual(list(sources.iterdir()) + list(keys.iterdir()), [])
+
     def test_apt_nvidia_repository_uses_scoped_key_and_preserves_existing_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -144,32 +178,13 @@ exec "$@"
             keys = root / 'keys'
             sources.mkdir()
             keys.mkdir()
-            helper = (TOOLS / 'resolve-apt.sh').read_text().replace('/etc/apt/sources.list.d', str(sources)).replace('/usr/share/keyrings', str(keys))
-            (root / 'helper.sh').write_text(helper)
-            (root / 'run.sh').write_text('''#!/bin/sh -e
-ESCALATION_TOOL=env
-confirm() { :; }
-install_packages() { :; }
-backup_system() { :; }
-curl() {
-    case "$2" in
-        */gpgkey) printf 'test key' > "$4" ;;
-        *) printf 'deb https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /\n' > "$4" ;;
-    esac
-}
-gpg() { cp "$5" "$4"; }
-. ./helper.sh
-resolve_apt_nvidia
-''')
-            (root / 'apt-get').write_text('#!/bin/sh\nexit 0\n')
-            (root / 'apt-get').chmod(0o755)
-            env = dict(os.environ, PATH=str(root) + ':' + os.environ['PATH'])
-            result = subprocess.run(['sh', '-e', './run.sh'], cwd=root, env=env, capture_output=True, text=True)
+            result = self.run_apt_helper(root, sources, keys)
             self.assertEqual(result.returncode, 0, result.stderr)
             source = sources / 'commander-nvidia-container-toolkit.list'
-            self.assertIn('signed-by=' + str(keys), source.read_text())
+            self.assertEqual(source.read_text(), 'deb [signed-by=%s/commander-nvidia-container-toolkit.gpg] '
+                             'https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /\n' % keys)
             self.assertEqual((keys / 'commander-nvidia-container-toolkit.gpg').read_text(), 'test key')
             source.write_text('existing custom settings')
-            result = subprocess.run(['sh', '-e', './run.sh'], cwd=root, env=env, capture_output=True, text=True)
+            result = self.run_apt_helper(root, sources, keys)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(source.read_text(), 'existing custom settings')

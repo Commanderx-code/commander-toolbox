@@ -105,15 +105,34 @@ class MaintenanceTests(unittest.TestCase):
             self.assertEqual((repo / 'README').read_text(), 'two')
             self.assertEqual(installed.read_text(), 'previous executable')
 
+    def allowed_origin_git(self):
+        original_git = tools.git
+        def git(path, *args):
+            if args == ('remote', 'get-url', 'origin'):
+                return 'https://github.com/Commanderx-code/commander-toolbox.git'
+            return original_git(path, *args)
+        return patch.object(tools, 'git', side_effect=git)
+
     def test_updater_refuses_local_edits(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = self.setup_repo(Path(tmp))
             (repo / 'README').write_text('my changes')
-            with patch.object(tools, 'confirm') as confirm:
+            with self.allowed_origin_git(), patch.object(tools, 'confirm') as confirm:
                 with self.assertRaisesRegex(ValueError, 'Local changes'):
                     tools.update_checkout(repo)
                 confirm.assert_not_called()
             self.assertEqual((repo / 'README').read_text(), 'my changes')
+
+    def test_updater_ignores_repository_command_config(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repo = self.setup_repo(root)
+            marker = root / 'fsmonitor-ran'
+            subprocess.run(['git', '-C', str(repo), 'config', 'core.fsmonitor', f'touch {marker}; false'], check=True)
+            with self.allowed_origin_git(), patch.object(tools, 'confirm', side_effect=ValueError('Cancelled')):
+                with self.assertRaisesRegex(ValueError, 'Cancelled'):
+                    tools.update_checkout(repo)
+            self.assertFalse(marker.exists())
 
 
 class PrinterTests(unittest.TestCase):
