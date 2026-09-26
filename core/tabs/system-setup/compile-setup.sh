@@ -23,6 +23,10 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
+            # Debian 13+ ships tldr only as tealdeer; Ubuntu 22.04 has tldr but no tealdeer.
+            if apt-cache show tealdeer >/dev/null 2>&1; then
+                DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
+            fi
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             ;;
         dnf)
