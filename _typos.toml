@@ -9,3 +9,7 @@ extend-ignore-identifiers-re = [
 # Upstream GRUB theme name; keep its original spelling.
 [default.extend-identifiers]
 DedSec = "DedSec"
+
+# GnuPG --with-colons fingerprint record type.
+[default.extend-words]
+fpr = "fpr"
