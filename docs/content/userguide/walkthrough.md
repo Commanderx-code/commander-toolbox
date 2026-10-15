@@ -75,7 +75,7 @@ https://github.com/ChrisTitusTech/neovim
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
 - **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
-- **Commander Workstation Setup**: Clone Commander dotfiles to ~/github/projects/dotfiles (or update a checkout there) and run its guided setup: Zed, Ghostty, Nix and Home Manager with Fish, Starship, Fastfetch and Neovim, optional everyday apps, the SilentSDDM login screen, GRUB settings with AppArmor, the boot splash, the UFW firewall and Restic backups. For Arch-based systems with pacman, such as Garuda. The setup shows its plan and waits for APPLY before changing anything.
+- **Commander Workstation Setup**: Clone Commander dotfiles to ~/github/projects/dotfiles (or update a checkout there) and run its guided setup: Zed and Ghostty, optionally Nix and Home Manager with Fish, Starship, Fastfetch, Neovim and Restic backups, optional everyday apps, the SilentSDDM login screen, the GRUB or Limine boot menu with AppArmor, the boot splash and the UFW firewall. For Arch-based systems with pacman, such as Garuda or CachyOS. The setup shows its plan and waits for APPLY before changing anything.
 
 ### Myfish Shell Setup
 

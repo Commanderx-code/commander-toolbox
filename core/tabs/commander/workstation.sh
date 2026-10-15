@@ -20,7 +20,7 @@ elif [ -e "$checkout" ]; then
 else
     plan="clone $repository to $checkout"
 fi
-confirm "This will $plan, then start its guided setup (scripts/setup). The setup asks for your name, Git identity and backup drive, which parts to install (everyday apps, SilentSDDM login screen, GRUB settings with AppArmor, the boot splash, the UFW firewall), shows its plan and waits for its own APPLY. It installs system packages with pacman, Nix and Home Manager, and asks for your password when it needs it."
+confirm "This will $plan, then start its guided setup (scripts/setup). The setup asks for your name and Git identity, whether to install Nix and Home Manager, your backup drive, and which parts to install (everyday apps, SilentSDDM login screen, the GRUB or Limine boot menu with AppArmor, the boot splash, the UFW firewall), shows its plan and waits for its own APPLY. It installs system packages with pacman and asks for your password when it needs it."
 if [ -d "$checkout/.git" ]; then
     git -C "$checkout" pull --ff-only || { printf '%s\n' 'The checkout could not be fast-forwarded; commit or stash its changes, update it, then rerun.' >&2; exit 1; }
 else

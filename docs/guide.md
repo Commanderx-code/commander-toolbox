@@ -109,8 +109,10 @@ has not been validated on real hardware across the supported distros.
   component: it clones `Commanderx-code/dotfiles` to `~/github/projects/dotfiles`
   (`COMMANDER_DOTFILES_DIR` chooses another path, and an existing checkout there,
   a fork included, is fast-forwarded instead) and runs `scripts/setup`, which asks
-  its own questions, installs with pacman, Nix and Home Manager, and waits for its
-  own `APPLY`. The checkout stays a normal clone for `hm-rebuild` and `git pull`
+  its own questions, installs with pacman and, unless declined, Nix and Home
+  Manager, and waits for its own `APPLY`. Declining Nix keeps the system-level
+  parts (login screen, boot menu, boot splash, firewall) and leaves the terminal
+  to Myfish or the Dotfiles entries. The checkout stays a normal clone for `hm-rebuild` and `git pull`
   afterwards. The setup script needs pacman, so the entry appears on Arch-based
   systems only; other distributions take the pieces from the entries above.
 - User configuration files/directories receive adjacent timestamped backups.
