@@ -28,6 +28,23 @@ class GrubThemeTests(unittest.TestCase):
             self.assertEqual((target / 'background.png').read_bytes(), b'theme image')
             self.assertEqual((target / 'LICENSE').read_text(), 'source license')
 
+    def test_cachyos_theme_comes_from_the_dotfiles_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'repo/grub/themes/cachyos'
+            (source / 'icons').mkdir(parents=True)
+            (source / 'theme.txt').write_text('desktop-image: "background.png"')
+            (source / 'background.png').write_bytes(b'image')
+            (source / 'terminus-18.pf2').write_bytes(b'font')
+            (source / 'icons/garuda.png').write_bytes(b'icon')
+            (source / 'LICENSE').write_text('gpl')
+            target = root / 'prepared'
+            configure.prepare_grub_theme(root / 'repo', target, 'cachyos')
+            self.assertEqual((target / 'background.png').read_bytes(), b'image')
+            self.assertEqual((target / 'terminus-18.pf2').read_bytes(), b'font')
+            self.assertEqual((target / 'icons/garuda.png').read_bytes(), b'icon')
+            self.assertEqual((target / 'LICENSE').read_text(), 'gpl')
+
     def test_commander_theme_is_not_prepared_from_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(ValueError):

@@ -99,6 +99,7 @@ https://github.com/ChrisTitusTech/neovim
 ### Grub Theme
 
 - **Commander GRUB Theme**: Install the Garuda dr460nized GRUB theme that the dotfiles GRUB settings use, from the grub-theme-garuda-dr460nized package in the Garuda repositories. Back up existing settings and regenerate the current machine's GRUB menu while preserving kernel arguments.
+- **CachyOS GRUB Theme**: Install the CachyOS theme by diegons490 (GPL-3.0), kept in dotfiles, so a GRUB machine can match the CachyOS Limine look. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Catppuccin Mocha GRUB Theme**: Install the pastel Mocha theme from catppuccin/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Dracula GRUB Theme**: Install the dark Dracula theme from dracula/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Tela GRUB Theme**: Install Tela from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
@@ -121,7 +122,8 @@ https://github.com/ChrisTitusTech/neovim
 
 ### Limine Boot Menu
 
-- **Commander Limine Boot Menu**: Install the boot menu look from dotfiles on a machine that boots with Limine, such as CachyOS: the CachyOS wallpaper, colours and a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up.
+- **CachyOS Limine Boot Menu**: Install the CachyOS look from dotfiles on a machine that boots with Limine: the CachyOS wallpaper, colours and a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up.
+- **Garuda Limine Boot Menu**: Install the Garuda dr460nized look from dotfiles on a machine that boots with Limine: the dr460nized wallpaper and colours with a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Dank Shell**: DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop

@@ -80,7 +80,8 @@ def validate_checkout(source, root, document):
                     source_path(root, path)
         # These integrations consume the same dotfiles pin outside the exported submenu.
         for path in ('configs/topgrade/topgrade.toml', 'sddm/metadata.desktop', 'sddm/configs/kratos.conf',
-                     'sddm/sddm-conf/20-silent.conf', 'plymouth/theme'):
+                     'sddm/sddm-conf/20-silent.conf', 'plymouth/theme', 'grub/themes/cachyos/theme.txt',
+                     'limine/themes/cachyos/limine.conf', 'limine/themes/garuda/limine.conf'):
             source_path(root, path)
 
 

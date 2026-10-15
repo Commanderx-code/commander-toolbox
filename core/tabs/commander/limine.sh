@@ -3,6 +3,12 @@
 . ./common.sh
 commander_init
 checkCommandRequirements 'python3'
+look=${1:-cachyos}
+case "$look" in
+    cachyos) look_name='CachyOS' ;;
+    garuda) look_name='Garuda dr460nized' ;;
+    *) printf '%s\n' 'Unknown Limine look.' >&2; exit 1 ;;
+esac
 # limine.conf lives on the boot partition: where /etc/default/limine says, or
 # under the usual mount points. It may be readable by root only.
 esp=''
@@ -21,16 +27,17 @@ if [ -z "$conf" ]; then
     exit 1
 fi
 wallpaper=dotfiles-splash.png
-confirm "Install the Commander boot menu look from dotfiles into $conf: the CachyOS wallpaper, copied beside it as $wallpaper, with its colours and a two-second timeout merged into the global settings. Boot entries and kernel arguments are not changed; the previous file is backed up."
+confirm "Install the $look_name boot menu look from dotfiles into $conf: its wallpaper, copied beside it as $wallpaper, with its colours and a two-second timeout merged into the global settings. Boot entries and kernel arguments are not changed; the previous file is backed up."
 command_exists git || install_packages git
 fetch_source dotfiles
-[ -f "$source_dir/limine/limine.conf" ] && [ -f "$source_dir/limine/$wallpaper" ] || { printf '%s\n' 'The dotfiles source has no Limine settings.' >&2; exit 1; }
+look_dir="$source_dir/limine/themes/$look"
+[ -f "$look_dir/limine.conf" ] && [ -f "$look_dir/splash.png" ] || { printf '%s\n' 'The dotfiles source has no Limine settings for this look.' >&2; exit 1; }
 work=$(mktemp -d)
 trap 'rm -rf "$work"' 0
 "$ESCALATION_TOOL" cp -- "$conf" "$work/current"
 "$ESCALATION_TOOL" chmod 644 "$work/current"
-python3 ./configure.py limine-appearance "$work/current" "$source_dir/limine/limine.conf" > "$work/limine.conf"
+python3 ./configure.py limine-appearance "$work/current" "$look_dir/limine.conf" > "$work/limine.conf"
 backup_system "$conf"
-"$ESCALATION_TOOL" install -m 644 -- "$source_dir/limine/$wallpaper" "$(dirname "$conf")/$wallpaper"
+"$ESCALATION_TOOL" install -m 644 -- "$look_dir/splash.png" "$(dirname "$conf")/$wallpaper"
 "$ESCALATION_TOOL" install -m 644 -- "$work/limine.conf" "$conf"
-printf 'Limine boot menu updated in %s. It shows at the next reboot.\n' "$conf"
+printf 'Limine boot menu updated in %s with the %s look. It shows at the next reboot.\n' "$conf" "$look_name"

@@ -5,7 +5,7 @@ commander_init
 checkCommandRequirements 'python3'
 variant=${1:-commander}
 case "$variant" in
-    commander | catppuccin | dracula | tela | vimix | default | ctt-cyberre | ctt-cyberpunk | ctt-shodan | ctt-fallout | ctt-dedsec | ctt-minegrub | ctt-bsol) ;;
+    commander | cachyos | catppuccin | dracula | tela | vimix | default | ctt-cyberre | ctt-cyberpunk | ctt-shodan | ctt-fallout | ctt-dedsec | ctt-minegrub | ctt-bsol) ;;
     *) printf '%s\n' 'Unknown GRUB theme.' >&2; exit 1 ;;
 esac
 [ -f /etc/default/grub ] || { printf '%s\n' 'An existing GRUB installation is required.'; exit 1; }
@@ -60,6 +60,7 @@ else
     confirm "Install the $variant GRUB theme with graphical output. Preserve kernel arguments and disk settings. Back up defaults, theme and boot menu before regenerating."
     command_exists git || install_packages git
     case "$variant" in
+        cachyos) fetch_source dotfiles ;;
         catppuccin) fetch_source grub-catppuccin ;;
         dracula) fetch_source grub-dracula ;;
         tela | vimix) fetch_source grub-vince ;;

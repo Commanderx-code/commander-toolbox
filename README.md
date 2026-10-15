@@ -101,13 +101,13 @@ bootstrap scripts and package installers still target Linutil.
 | **Applications Setup → Dotfiles** | Install only the application configurations you want. |
 | **Applications Setup → Grub Theme** | Pick a theme or restore the plain GRUB menu. |
 | **Applications Setup → Boot Splash** | Select the dotfiles boot splash or any installed Plymouth theme, or turn the splash on or off. |
-| **Applications Setup → Limine Boot Menu** | Give a Limine machine, such as CachyOS, the dotfiles boot menu look. |
+| **Applications Setup → Limine Boot Menu** | Give a Limine machine, such as CachyOS, the CachyOS or Garuda boot menu look. |
 | **Applications Setup → SDDM Theme** | Preview the login theme before activation, then let SDDM run the login screen. |
 | **System Setup → Debian / Ubuntu → Nala Package Manager** | Add Nala and shell aliases while keeping the original APT executable. |
 | **Security** | Select AppArmor or Fedora SELinux tools for your system. |
 
-GRUB choices include **Commander, Catppuccin Mocha, Dracula, Tela, Vimix,
-CyberRe, Cyberpunk, Shodan, Fallout, DedSec, Minegrub and BSOL**.
+GRUB choices include **Commander, CachyOS, Catppuccin Mocha, Dracula, Tela,
+Vimix, CyberRe, Cyberpunk, Shodan, Fallout, DedSec, Minegrub and BSOL**.
 Tela and Vimix offer 1080p, 2K and 4K assets.
 
 Fastfetch chooses the distro logo each time it runs. PNG display requires an

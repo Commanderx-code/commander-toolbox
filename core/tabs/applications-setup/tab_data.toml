@@ -527,6 +527,18 @@ data = "file_exists"
 values = ["/etc/default/grub"]
 
 [[data.entries]]
+name = "CachyOS GRUB Theme"
+description = "Install the CachyOS theme by diegons490 (GPL-3.0), kept in dotfiles, so a GRUB machine can match the CachyOS Limine look. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/grub-cachyos.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
 name = "Catppuccin Mocha GRUB Theme"
 description = "Install the pastel Mocha theme from catppuccin/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
 script = "../commander/grub-catppuccin.sh"
@@ -715,9 +727,21 @@ multi_select = false
 name = "Limine Boot Menu"
 
 [[data.entries]]
-name = "Commander Limine Boot Menu"
-description = "Install the boot menu look from dotfiles on a machine that boots with Limine, such as CachyOS: the CachyOS wallpaper, colours and a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up."
-script = "../commander/limine.sh"
+name = "CachyOS Limine Boot Menu"
+description = "Install the CachyOS look from dotfiles on a machine that boots with Limine: the CachyOS wallpaper, colours and a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up."
+script = "../commander/limine-cachyos.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["limine"]
+
+[[data.entries]]
+name = "Garuda Limine Boot Menu"
+description = "Install the Garuda dr460nized look from dotfiles on a machine that boots with Limine: the dr460nized wallpaper and colours with a two-second timeout merged into the global settings of limine.conf. Boot entries and kernel arguments stay as they are; the previous file is backed up."
+script = "../commander/limine-garuda.sh"
 task_list = "PFM"
 multi_select = false
 

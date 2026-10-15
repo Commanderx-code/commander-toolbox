@@ -81,7 +81,9 @@ CTT_GRUB_THEMES = {'ctt-cyberre': 'CyberRe', 'ctt-cyberpunk': 'Cyberpunk', 'ctt-
 def prepare_grub_theme(repo, destination, variant, resolution='1080p'):
     if variant == 'commander':
         raise ValueError('The Commander theme comes from the grub-theme-garuda-dr460nized package.')
-    if variant == 'catppuccin':
+    if variant == 'cachyos':
+        source = repo / 'grub/themes/cachyos'
+    elif variant == 'catppuccin':
         source = repo / 'src/catppuccin-mocha-grub-theme'
     elif variant == 'dracula':
         source = repo / 'dracula'

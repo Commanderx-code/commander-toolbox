@@ -47,7 +47,7 @@ this build with the stock application through the menu.
 | Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, the Ghostty preset with its palette files and Spotify profile, or Zellij. Existing settings are backed up or preserved. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs the Garuda dr460nized theme package the dotfiles GRUB settings use, while preserving current kernel/disk settings. Garuda repositories only. |
 | Applications Setup > Boot Splash | Commander Boot Splash / Boot Splash Theme / Enable / Disable | Select the Plymouth theme named in dotfiles, pick any installed theme, or turn the splash on or off through the kernel command line in `/etc/default/grub` or, on CachyOS, `/etc/default/limine`; each rebuilds the boot images with the distro's own tool. |
-| Applications Setup > Limine Boot Menu | Commander Limine Boot Menu | On a machine that boots with Limine, merges the dotfiles boot menu look (the CachyOS wallpaper and colours, a two-second timeout) into the global settings of `limine.conf`, leaving the boot entries alone. |
+| Applications Setup > Limine Boot Menu | CachyOS / Garuda Limine Boot Menu | On a machine that boots with Limine, merges one of the two dotfiles boot menu looks (a wallpaper and colours with a two-second timeout) into the global settings of `limine.conf`, leaving the boot entries alone. |
 | Applications Setup | SDDM Theme | Installs SilentSDDM with the dotfiles presets (Kratos by default), previews it, asks before activation, then offers to make SDDM the login screen. |
 | System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
 | System Setup | Commander Topgrade | Replaces the default Topgrade action with your adapted config and an optional update run. |
@@ -141,16 +141,19 @@ has not been validated on real hardware across the supported distros.
   backs up the existing Fastfetch configuration, launcher and shell startup file.
   Remove the marked shell shortcut and restore those backups to undo installation.
 - GRUB requires an existing installation and its menu generator/syntax checker.
-  Themes include the Commander theme, Catppuccin Mocha, Dracula, Tela, Vimix,
-  and seven presets from ChrisTitusTech/bootloader-themes.
+  Themes include the Commander theme, the CachyOS theme, Catppuccin Mocha,
+  Dracula, Tela, Vimix, and seven presets from ChrisTitusTech/bootloader-themes.
   Downloaded assets are fetched at pinned commits and installed under the active
   GRUB boot directory, so a separate `/boot` can access them. The Commander
   theme is the Garuda dr460nized theme named in the dotfiles GRUB settings; it
   comes from the `grub-theme-garuda-dr460nized` package and stays at its package
   location under `/usr/share/grub/themes`, so the entry needs the Garuda
-  repositories. The dotfiles `restore-grub` installs the complete settings file
-  (menu timeout, resolution, AppArmor parameter); the toolbox changes appearance
-  only. Tela/Vimix offer 1080p, 2K
+  repositories. The CachyOS theme is diegons490's GPL-3.0 theme kept in the
+  dotfiles repository under `grub/themes/cachyos`, installed like the other
+  downloaded themes, so a GRUB machine can match the CachyOS Limine look. The
+  dotfiles `restore-grub` installs the complete settings file (menu timeout,
+  resolution, AppArmor parameter) with either look; the toolbox changes
+  appearance only. Tela/Vimix offer 1080p, 2K
   and 4K asset sizes. The installer enables graphical terminal output; explicit
   `GRUB_TERMINAL` settings and conflicting appearance drop-ins require manual
   resolution first. Existing kernel, disk, timeout and boot-entry settings stay.
@@ -201,16 +204,18 @@ has not been validated on real hardware across the supported distros.
   copied in, and on Arch a `plymouth-theme-<name>` package is installed; a theme
   that only exists on the KDE Store, such as the current default, must be
   fetched with Get New first, and the entry says so.
-- Commander Limine Boot Menu is the Limine counterpart of the Commander GRUB
-  theme. Limine has no theme packages; its menu is styled by a few settings in
+- The Limine Boot Menu entries are the Limine counterpart of the GRUB themes.
+  Limine has no theme packages; its menu is styled by a few settings in
   `limine.conf` (found through `ESP_PATH` in `/etc/default/limine` or under
-  `/boot`, `/efi` and `/boot/efi`). The entry copies the dotfiles wallpaper
-  beside that file as `dotfiles-splash.png` and merges the appearance settings
-  from the dotfiles `limine/limine.conf` into the global section, replacing the
-  same keys and keeping everything else, including the `/` boot entries that
+  `/boot`, `/efi` and `/boot/efi`). Each entry copies its wallpaper beside that
+  file as `dotfiles-splash.png` and merges the appearance settings from the
+  dotfiles `limine/themes/<look>/limine.conf` into the global section, replacing
+  the same keys and keeping everything else, including the `/` boot entries that
   the entry tool rewrites on kernel updates. Limine has no syntax checker, so
-  the safety net is the backup made before the write. The look is diegons490's
-  CachyOS Limine theme, GPL-3.0, kept in the dotfiles repository with its license.
+  the safety net is the backup made before the write. The CachyOS look is
+  diegons490's CachyOS Limine theme, GPL-3.0, kept in the dotfiles repository
+  with its license; the Garuda look is the dr460nized GRUB theme's wallpaper
+  and colours (GPL).
 - AppArmor on an Arch-family system that boots with GRUB, or with Limine and
   its entry tool: when the running kernel has not enabled it, the entry offers to
   set `lsm=landlock,lockdown,yama,integrity,apparmor,bpf` in `/etc/default/grub`
