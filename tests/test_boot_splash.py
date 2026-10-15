@@ -203,7 +203,7 @@ fetch_source() {{ source_dir="{self.source}"; }}
         self.assertEqual(self.calls(), [])
 
     def test_limine_entries_get_the_argument_through_the_entry_tool(self):
-        self.defaults.unlink()
+        # /etc/default/grub stays in place: the grub package leaves it behind on Limine machines.
         limine = self.root / 'etc/default/limine'
         limine.write_text('ESP_PATH="/boot"\nKERNEL_CMDLINE[default]="quiet"\n')
         self.write_tool('limine-mkinitcpio', 'echo "limine-mkinitcpio $*" >> "$CALLS"')
@@ -215,6 +215,7 @@ fetch_source() {{ source_dir="{self.source}"; }}
         # The entry tool rebuilt the boot images; mkinitcpio is not run a second time.
         self.assertEqual(self.calls(), ['install plymouth', 'limine-mkinitcpio '])
         self.assertEqual(self.menu.read_text(), 'original boot menu')
+        self.assertEqual(self.defaults.read_text(), 'GRUB_TIMEOUT=5\nGRUB_CMDLINE_LINUX_DEFAULT="quiet"\n')
         self.log.unlink()
         result = self.run_script('off', ['mkinitcpio', 'limine-mkinitcpio'])
         self.assertEqual(result.returncode, 0, result.stderr)

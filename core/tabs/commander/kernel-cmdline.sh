@@ -22,7 +22,17 @@ cmdline_pending=false
 cmdline_backup=''
 
 cmdline_setup() {
-    if [ -f /etc/default/grub ]; then
+    # The grub package leaves /etc/default/grub behind even where Limine boots,
+    # so a machine with the Limine entry tool is a Limine machine.
+    if [ -f /etc/default/limine ] && { command_exists limine-mkinitcpio || command_exists limine-dracut; }; then
+        cmdline_backend=limine
+        cmdline_file=/etc/default/limine
+        if command_exists limine-mkinitcpio; then
+            regenerate=limine-mkinitcpio
+        else
+            regenerate=limine-dracut
+        fi
+    elif [ -f /etc/default/grub ]; then
         cmdline_backend=grub
         cmdline_file=/etc/default/grub
         if [ "$DTYPE" = fedora ]; then
@@ -47,16 +57,8 @@ cmdline_setup() {
             fi
         done
     elif [ -f /etc/default/limine ]; then
-        cmdline_backend=limine
-        cmdline_file=/etc/default/limine
-        if command_exists limine-mkinitcpio; then
-            regenerate=limine-mkinitcpio
-        elif command_exists limine-dracut; then
-            regenerate=limine-dracut
-        else
-            printf '%s\n' 'The Limine entry tool (limine-mkinitcpio-hook or limine-dracut-support) is needed to carry kernel arguments into the boot entries; no changes made.' >&2
-            exit 1
-        fi
+        printf '%s\n' 'The Limine entry tool (limine-mkinitcpio-hook or limine-dracut-support) is needed to carry kernel arguments into the boot entries; no changes made.' >&2
+        exit 1
     else
         printf '%s\n' "$1" >&2
         exit 1
