@@ -110,6 +110,12 @@ https://github.com/ChrisTitusTech/neovim
 - **Minegrub (Minecraft) GRUB Theme**: Install Minegrub (Minecraft) from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
 - **BSOL GRUB Theme**: Install BSOL from ChrisTitusTech/bootloader-themes at a pinned commit. Back up current settings and syntax-check the regenerated menu while preserving kernel arguments and boot timeout.
 - **Restore Default GRUB Appearance**: Disable custom themes and backgrounds and restore a plain console menu. Preserves current kernel arguments, disk settings and boot entries; does not reinstall GRUB. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+
+### Boot Splash
+
+- **Boot Splash Theme**: Choose an installed Plymouth theme for the splash shown while the system starts, then rebuild the boot images with the distro's own tool (dracut-rebuild, dracut, mkinitcpio or update-initramfs). Kernel arguments are not changed.
+- **Enable Boot Splash**: Install Plymouth, add 'splash' to the GRUB kernel command line (and the plymouth hook on mkinitcpio systems), regenerate the GRUB menu and rebuild the boot images. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
+- **Disable Boot Splash**: Remove 'splash' and 'rhgb' from the GRUB kernel command line and regenerate the menu, so the system boots with text output. Plymouth and its themes stay installed. Backups are created before changes.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Dank Shell**: DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop

@@ -659,6 +659,45 @@ data = "file_exists"
 values = ["/etc/default/grub"]
 
 [[data]]
+name = "Boot Splash"
+
+[[data.entries]]
+name = "Boot Splash Theme"
+description = "Choose an installed Plymouth theme for the splash shown while the system starts, then rebuild the boot images with the distro's own tool (dracut-rebuild, dracut, mkinitcpio or update-initramfs). Kernel arguments are not changed."
+script = "../commander/plymouth-theme.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["plymouth-set-default-theme"]
+
+[[data.entries]]
+name = "Enable Boot Splash"
+description = "Install Plymouth, add 'splash' to the GRUB kernel command line (and the plymouth hook on mkinitcpio systems), regenerate the GRUB menu and rebuild the boot images. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one."
+script = "../commander/plymouth-on.sh"
+task_list = "I PFM MP"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data.entries]]
+name = "Disable Boot Splash"
+description = "Remove 'splash' and 'rhgb' from the GRUB kernel command line and regenerate the menu, so the system boots with text output. Plymouth and its themes stay installed. Backups are created before changes."
+script = "../commander/plymouth-off.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data.entries.preconditions]]
+matches = true
+data = "file_exists"
+values = ["/etc/default/grub"]
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"

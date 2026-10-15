@@ -34,6 +34,7 @@ this build with the stock application through the menu.
 | Applications Setup > Dotfiles | Zellij Terminal Sessions | Install Zellij if missing; create a Tokyo Night Storm/locked-mode preset only when no configuration exists. No shell reinstallation or automatic startup. |
 | Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, optional Ghostty profile or Zellij. Existing settings are backed up or preserved. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs your CachyOS-based theme while preserving current kernel/disk settings. |
+| Applications Setup > Boot Splash | Boot Splash Theme / Enable / Disable | Pick an installed Plymouth theme and rebuild the boot images with the distro's own tool, or turn the splash on or off through the GRUB kernel command line. |
 | Applications Setup | SDDM Theme | Installs the dedicated `sddm/` SilentSDDM Revan preset, previews it, then asks before activation. |
 | System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
 | System Setup | Commander Topgrade | Replaces the default Topgrade action with your adapted config and an optional update run. |
@@ -134,6 +135,18 @@ has not been validated on real hardware across the supported distros.
   settings updated because it takes precedence. SDDM is never restarted.
   Existing theme, fonts and configuration get adjacent backups; copied assets
   can remain after a cancelled preview.
+- Boot Splash entries need GRUB with `/etc/default/grub` to turn the splash on
+  or off; systemd-boot and Limine users edit the kernel command line themselves.
+  Enabling installs Plymouth, adds `splash`, adds the `plymouth` hook to
+  `/etc/mkinitcpio.conf` on mkinitcpio systems (drop-ins that set `HOOKS` must
+  be adjusted by hand), regenerates the menu with the same backup and syntax
+  check as the GRUB themes, updates Fedora's boot entries with `grubby`, and
+  rebuilds the boot images with `dracut-rebuild`, `mkinitcpio -P`,
+  `update-initramfs` or `dracut`, whichever the system uses. The theme chooser
+  lists installed themes only; it rebuilds the boot images because the splash is
+  read from them, which KDE's Boot Splash Screen page cannot do on dracut-based
+  Arch systems such as Garuda. Disabling removes `splash` and `rhgb` and keeps
+  Plymouth installed.
 - AppArmor does not edit boot arguments. If the kernel has not enabled it,
   follow your distro's setup instructions and reboot first. Fedora keeps
   SELinux. Myfish's native backend avoids its automatic Nix installer's

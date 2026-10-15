@@ -118,6 +118,54 @@ def prepare_grub_theme(repo, destination, variant, resolution='1080p'):
 
 
 
+def render_kernel_cmdline(text, action, words):
+    # Add or drop words in GRUB_CMDLINE_LINUX_DEFAULT; every other setting stays.
+    pattern = re.compile(r'^([ \t]*(?:export[ \t]+)?GRUB_CMDLINE_LINUX_DEFAULT=)(.*)$', re.M)
+    matches = list(pattern.finditer(text))
+    current = []
+    if matches:
+        try:
+            current = ' '.join(shlex.split(matches[-1].group(2), comments=True)).split()
+        except ValueError as error:
+            raise ValueError(f'Cannot read GRUB_CMDLINE_LINUX_DEFAULT: {error}')
+    if action == 'add':
+        updated = current + [word for word in words if word not in current]
+    elif action == 'remove':
+        updated = [word for word in current if word not in words]
+    else:
+        raise ValueError('Unknown kernel argument action.')
+    value = json.dumps(' '.join(updated), ensure_ascii=False)
+    if matches:
+        match = matches[-1]
+        return text[:match.start()] + match.group(1) + value + text[match.end():]
+    line = 'GRUB_CMDLINE_LINUX_DEFAULT=' + value + '\n'
+    return text.rstrip('\n') + '\n' + line if text.strip() else line
+
+
+def render_mkinitcpio_hooks(text, action):
+    # Plymouth must run right after udev or systemd in the initramfs, before
+    # hooks such as encrypt that may ask for input.
+    pattern = re.compile(r'^([ \t]*HOOKS=)(?:\((.*?)\)|"(.*?)"|\'(.*?)\'|(\S*))[ \t]*$', re.M)
+    matches = list(pattern.finditer(text))
+    if not matches:
+        raise ValueError('mkinitcpio.conf has no HOOKS line.')
+    match = matches[-1]
+    hooks = next(group for group in match.groups()[1:] if group is not None).split()
+    if action == 'add':
+        if 'plymouth' not in hooks:
+            for anchor in ('systemd', 'udev', 'base'):
+                if anchor in hooks:
+                    hooks.insert(hooks.index(anchor) + 1, 'plymouth')
+                    break
+            else:
+                hooks.insert(0, 'plymouth')
+    elif action == 'remove':
+        hooks = [hook for hook in hooks if hook != 'plymouth']
+    else:
+        raise ValueError('Unknown hook action.')
+    return text[:match.start()] + match.group(1) + '(' + ' '.join(hooks) + ')' + text[match.end():]
+
+
 def render_sddm(text):
     parser = configparser.ConfigParser(interpolation=None, strict=False)
     parser.optionxform = str
@@ -270,6 +318,10 @@ def main():
         prepare_grub_theme(source, Path(args[0]), args[1], args[2])
     elif mode == 'sddm':
         print(render_sddm(source.read_text()), end='')
+    elif mode == 'grub-cmdline':
+        print(render_kernel_cmdline(source.read_text(), args[0], args[1:]), end='')
+    elif mode == 'mkinitcpio-hooks':
+        print(render_mkinitcpio_hooks(source.read_text(), args[0]), end='')
     else:
         raise ValueError('Unknown configuration action.')
 
