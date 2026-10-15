@@ -90,7 +90,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Commander Fastfetch Config**: Install your Fastfetch layout, automatic distro PNG logo and terminal-aware launcher and ImageMagick dependencies with backups. Installs Fastfetch when missing and checks image-backend support. Requires an image-capable terminal.
 - **Commander Starship Config**: Install your Starship configuration from dotfiles with a backup of existing files. Install the application separately.
 - **Commander Konsole Config**: Install your Konsole configuration from dotfiles with a backup of existing files. Install the application separately.
-- **Commander Ghostty Profile Config**: Install your Ghostty Profile configuration from dotfiles with a backup of existing files. Install the application separately.
+- **Commander Ghostty Config**: Install the Ghostty starting preset, the palette theme and tab-bar style it reads, and the Spotify profile from dotfiles, with backups of existing files. Install Ghostty and the MesloLGS Nerd Font separately.
 - **Zellij Terminal Sessions**: Install Zellij and create an optional Tokyo Night Storm preset. Preserve existing configuration; no automatic startup. Requires a distro package or an existing Zellij installation.
 - **NetWatch Network Dashboard**: Install pinned NetWatch through Nix on Linux x86_64. Ordinary monitoring is unprivileged; capture permissions remain a separate choice.
 - **TFM Visual File Manager**: Install the pinned TFM beta through Nix on Linux x86_64, with preview and Wayland clipboard helpers. Use Ghostty for image previews.
