@@ -29,7 +29,7 @@ class AppArmorScriptTests(unittest.TestCase):
         self.log = self.root / 'calls.log'
         for name in ('apparmor.sh', 'kernel-cmdline.sh'):
             script = (TOOLS / name).read_text()
-            for path in ('/etc/default/grub', '/boot/grub', '/sys/module/apparmor/parameters/enabled'):
+            for path in ('/etc/default/grub', '/etc/default/limine', '/boot/grub', '/sys/module/apparmor/parameters/enabled'):
                 script = script.replace(path, str(self.root) + path)
             (self.tools / name).write_text(script)
         shutil.copy2(TOOLS / 'configure.py', self.tools / 'configure.py')
@@ -77,6 +77,18 @@ backup_system() {{ backup="$1.backup"; cp -a "$1" "$backup"; }}
         self.assertEqual(self.defaults.read_text(), 'GRUB_TIMEOUT=5\nGRUB_CMDLINE_LINUX_DEFAULT="quiet splash"\n')
         self.assertEqual(self.menu.read_text(), 'original boot menu')
         self.assertEqual(list(self.boot.glob('.commander-grub.*')), [])
+
+    def test_limine_machines_get_the_parameter_through_the_entry_tool(self):
+        self.enabled.write_text('N\n')
+        self.defaults.unlink()
+        limine = self.root / 'etc/default/limine'
+        limine.write_text('KERNEL_CMDLINE[default]="quiet splash lsm=landlock,yama"\n')
+        self.write_tool('limine-mkinitcpio', 'echo "limine-mkinitcpio" >> "$CALLS"')
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(limine.read_text(), 'KERNEL_CMDLINE[default]="quiet splash lsm=landlock,lockdown,yama,integrity,apparmor,bpf"\n')
+        self.assertEqual(self.calls(), ['limine-mkinitcpio'])
+        self.assertTrue(limine.with_name('limine.backup').is_file())
 
     def test_debian_without_apparmor_is_only_told(self):
         self.enabled.write_text('N\n')

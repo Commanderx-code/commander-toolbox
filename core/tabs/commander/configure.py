@@ -118,6 +118,18 @@ def prepare_grub_theme(repo, destination, variant, resolution='1080p'):
 
 
 
+def update_words(current, action, words):
+    if action == 'add':
+        return current + [word for word in words if word not in current]
+    if action == 'remove':
+        return [word for word in current if word not in words]
+    if action == 'set':
+        keys = {word.split('=', 1)[0] for word in words if '=' in word}
+        return [word for word in current
+                if word not in words and not ('=' in word and word.split('=', 1)[0] in keys)] + list(words)
+    raise ValueError('Unknown kernel argument action.')
+
+
 def render_kernel_cmdline(text, action, words):
     # Add or drop words in GRUB_CMDLINE_LINUX_DEFAULT; every other setting stays.
     pattern = re.compile(r'^([ \t]*(?:export[ \t]+)?GRUB_CMDLINE_LINUX_DEFAULT=)(.*)$', re.M)
@@ -128,22 +140,64 @@ def render_kernel_cmdline(text, action, words):
             current = ' '.join(shlex.split(matches[-1].group(2), comments=True)).split()
         except ValueError as error:
             raise ValueError(f'Cannot read GRUB_CMDLINE_LINUX_DEFAULT: {error}')
-    if action == 'add':
-        updated = current + [word for word in words if word not in current]
-    elif action == 'remove':
-        updated = [word for word in current if word not in words]
-    elif action == 'set':
-        keys = {word.split('=', 1)[0] for word in words if '=' in word}
-        updated = [word for word in current
-                   if word not in words and not ('=' in word and word.split('=', 1)[0] in keys)] + list(words)
-    else:
-        raise ValueError('Unknown kernel argument action.')
+    updated = update_words(current, action, words)
     value = json.dumps(' '.join(updated), ensure_ascii=False)
     if matches:
         match = matches[-1]
         return text[:match.start()] + match.group(1) + value + text[match.end():]
     line = 'GRUB_CMDLINE_LINUX_DEFAULT=' + value + '\n'
     return text.rstrip('\n') + '\n' + line if text.strip() else line
+
+
+LIMINE_MARKER = '# Boot menu appearance from dotfiles (restore-limine).'
+LIMINE_KEY = re.compile(r'^[ \t]*([a-z_]+)[ \t]*:')
+LIMINE_CMDLINE = re.compile(r'^([ \t]*KERNEL_CMDLINE\[(?:"default"|default)\]\+?=)(.*)$', re.M)
+
+
+def render_limine_appearance(current, fragment):
+    # Merge the dotfiles key: value lines into the global section of limine.conf,
+    # which ends at the first "/" entry; the entries stay exactly as they are.
+    settings = []
+    for line in fragment.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith('#'):
+            continue
+        match = LIMINE_KEY.match(stripped)
+        if not match:
+            raise ValueError(f'Not a Limine setting: {stripped}')
+        settings.append((match.group(1), stripped))
+    keys = {key for key, _ in settings}
+    lines = current.splitlines()
+    end = next((index for index, line in enumerate(lines) if line.lstrip().startswith('/')), len(lines))
+    kept = []
+    for line in lines[:end]:
+        match = LIMINE_KEY.match(line)
+        if (match and match.group(1) in keys) or line.strip() == LIMINE_MARKER:
+            continue
+        kept.append(line)
+    while kept and not kept[-1].strip():
+        kept.pop()
+    block = ([''] if kept else []) + [LIMINE_MARKER] + [line for _, line in settings]
+    entries = lines[end:]
+    if entries:
+        block.append('')
+    return '\n'.join(kept + block + entries).rstrip('\n') + '\n'
+
+
+def render_limine_cmdline(text, action, words):
+    # The entry tool reads KERNEL_CMDLINE[default] from /etc/default/limine.
+    matches = list(LIMINE_CMDLINE.finditer(text))
+    if not matches:
+        raise ValueError('No KERNEL_CMDLINE[default] line in /etc/default/limine; add one with the current kernel parameters first.')
+    match = matches[-1]
+    try:
+        current = ' '.join(shlex.split(match.group(2), comments=True)).split()
+    except ValueError as error:
+        raise ValueError(f'Cannot read KERNEL_CMDLINE[default]: {error}')
+    updated = update_words(current, action, words)
+    if any('"' in word for word in updated):
+        raise ValueError('Kernel parameters cannot contain quotes.')
+    return text[:match.start()] + match.group(1) + '"' + ' '.join(updated) + '"' + text[match.end():]
 
 
 def render_mkinitcpio_hooks(text, action):
@@ -368,6 +422,10 @@ def main():
         print(render_kernel_cmdline(source.read_text(), args[0], args[1:]), end='')
     elif mode == 'mkinitcpio-hooks':
         print(render_mkinitcpio_hooks(source.read_text(), args[0]), end='')
+    elif mode == 'limine-appearance':
+        print(render_limine_appearance(source.read_text(), Path(args[0]).read_text()), end='')
+    elif mode == 'limine-cmdline':
+        print(render_limine_cmdline(source.read_text(), args[0], args[1:]), end='')
     else:
         raise ValueError('Unknown configuration action.')
 

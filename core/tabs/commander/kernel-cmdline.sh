@@ -1,79 +1,112 @@
 #!/bin/sh -e
-# Shared GRUB kernel command line transaction, sourced after common.sh.
+# Shared kernel command line transaction, sourced after common.sh. It edits
+# GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub and regenerates the GRUB
+# menu, or, on a Limine machine whose entries the Limine entry tool manages
+# (CachyOS), KERNEL_CMDLINE[default] in /etc/default/limine followed by the
+# tool's regeneration, which also rebuilds the boot images.
 #
-# grub_cmdline_setup MESSAGE  finds the GRUB layout and refuses drop-ins that
-#                             override /etc/default/grub; MESSAGE explains what
-#                             to do without GRUB.
-# grub_cmdline_apply ACTION WORD...  edits GRUB_CMDLINE_LINUX_DEFAULT, generates
-#                             the menu into a temporary file, syntax-checks it
-#                             and only then replaces the live menu.
-# grub_cmdline_cleanup        restores the previous defaults after a failure;
-#                             callers run it from their exit trap.
+# cmdline_setup MESSAGE        picks the boot loader and refuses drop-ins that
+#                              override the file; MESSAGE explains what to do
+#                              when neither boot loader is found.
+# cmdline_apply ACTION WORD...  add, remove or set words, writing the file only
+#                              when the generated menu passes its checks.
+# cmdline_cleanup              restores the previous file after a failure;
+#                              callers run it from their exit trap.
 
-grub_work=''
-grub_new_menu=''
-grub_config_pending=false
-grub_defaults_backup=''
+cmdline_backend=''
+cmdline_file=''
+cmdline_rebuilt_initramfs=false
+cmdline_work=''
+cmdline_new_menu=''
+cmdline_pending=false
+cmdline_backup=''
 
-grub_cmdline_setup() {
-    if [ ! -f /etc/default/grub ]; then
+cmdline_setup() {
+    if [ -f /etc/default/grub ]; then
+        cmdline_backend=grub
+        cmdline_file=/etc/default/grub
+        if [ "$DTYPE" = fedora ]; then
+            generator=grub2-mkconfig
+            checker=grub2-script-check
+            output=/boot/grub2/grub.cfg
+        elif command_exists grub-mkconfig && [ -d /boot/grub ]; then
+            generator=grub-mkconfig
+            checker=grub-script-check
+            output=/boot/grub/grub.cfg
+        else
+            printf '%s\n' 'Unsupported GRUB layout; no changes made.' >&2
+            exit 1
+        fi
+        checkCommandRequirements "$generator $checker"
+        # Debian drop-ins may override /etc/default/grub. Do not silently report success.
+        for fragment in /etc/default/grub.d/*.cfg; do
+            [ -f "$fragment" ] || continue
+            if grep -Eq '^[[:space:]]*(export[[:space:]]+)?GRUB_CMDLINE_LINUX(_DEFAULT)?=' "$fragment"; then
+                printf 'Kernel arguments in %s override /etc/default/grub. Adjust that drop-in first; no changes made.\n' "$fragment" >&2
+                exit 1
+            fi
+        done
+    elif [ -f /etc/default/limine ]; then
+        cmdline_backend=limine
+        cmdline_file=/etc/default/limine
+        if command_exists limine-mkinitcpio; then
+            regenerate=limine-mkinitcpio
+        elif command_exists limine-dracut; then
+            regenerate=limine-dracut
+        else
+            printf '%s\n' 'The Limine entry tool (limine-mkinitcpio-hook or limine-dracut-support) is needed to carry kernel arguments into the boot entries; no changes made.' >&2
+            exit 1
+        fi
+    else
         printf '%s\n' "$1" >&2
         exit 1
     fi
-    if [ "$DTYPE" = fedora ]; then
-        generator=grub2-mkconfig
-        checker=grub2-script-check
-        output=/boot/grub2/grub.cfg
-    elif command_exists grub-mkconfig && [ -d /boot/grub ]; then
-        generator=grub-mkconfig
-        checker=grub-script-check
-        output=/boot/grub/grub.cfg
+    cmdline_work=$(mktemp -d)
+}
+
+cmdline_cleanup() {
+    if [ "$cmdline_pending" = true ]; then
+        "$ESCALATION_TOOL" cp -a -- "$cmdline_backup" "$cmdline_file"
+        printf 'Boot menu generation failed or was interrupted. Previous %s restored; existing boot menu preserved.\n' "$cmdline_file" >&2
+    fi
+    if [ -n "$cmdline_new_menu" ]; then
+        "$ESCALATION_TOOL" rm -f -- "$cmdline_new_menu"
+    fi
+    if [ -n "$cmdline_work" ]; then
+        rm -rf "$cmdline_work"
+    fi
+}
+
+cmdline_apply() {
+    if [ "$cmdline_backend" = limine ]; then
+        python3 ./configure.py limine-cmdline "$cmdline_file" "$@" > "$cmdline_work/defaults"
     else
-        printf '%s\n' 'Unsupported GRUB layout; no changes made.' >&2
-        exit 1
+        python3 ./configure.py grub-cmdline "$cmdline_file" "$@" > "$cmdline_work/defaults"
     fi
-    checkCommandRequirements "$generator $checker"
-    # Debian drop-ins may override /etc/default/grub. Do not silently report success.
-    for fragment in /etc/default/grub.d/*.cfg; do
-        [ -f "$fragment" ] || continue
-        if grep -Eq '^[[:space:]]*(export[[:space:]]+)?GRUB_CMDLINE_LINUX(_DEFAULT)?=' "$fragment"; then
-            printf 'Kernel arguments in %s override /etc/default/grub. Adjust that drop-in first; no changes made.\n' "$fragment" >&2
-            exit 1
-        fi
-    done
-    grub_work=$(mktemp -d)
-}
-
-grub_cmdline_cleanup() {
-    if [ "$grub_config_pending" = true ]; then
-        "$ESCALATION_TOOL" cp -a -- "$grub_defaults_backup" /etc/default/grub
-        printf '%s\n' 'GRUB generation failed or was interrupted. Previous defaults restored; existing boot menu preserved.' >&2
-    fi
-    if [ -n "$grub_new_menu" ]; then
-        "$ESCALATION_TOOL" rm -f -- "$grub_new_menu"
-    fi
-    if [ -n "$grub_work" ]; then
-        rm -rf "$grub_work"
-    fi
-}
-
-grub_cmdline_apply() {
-    python3 ./configure.py grub-cmdline /etc/default/grub "$@" > "$grub_work/defaults"
-    if cmp -s "$grub_work/defaults" /etc/default/grub; then
-        printf '%s\n' 'Kernel arguments already as requested; GRUB menu unchanged.'
+    if cmp -s "$cmdline_work/defaults" "$cmdline_file"; then
+        printf 'Kernel arguments already as requested; %s unchanged.\n' "$cmdline_file"
         return 0
     fi
-    backup_system /etc/default/grub
+    backup_system "$cmdline_file"
     # backup_system, from common.sh, leaves the copy's path in backup.
     # shellcheck disable=SC2154
-    grub_defaults_backup=$backup
-    backup_system "$output"
-    grub_new_menu=$("$ESCALATION_TOOL" mktemp "$(dirname "$output")/.commander-grub.XXXXXX")
-    grub_config_pending=true
-    "$ESCALATION_TOOL" install -m 644 "$grub_work/defaults" /etc/default/grub
-    "$ESCALATION_TOOL" "$generator" -o "$grub_new_menu"
-    "$ESCALATION_TOOL" "$checker" "$grub_new_menu"
-    "$ESCALATION_TOOL" mv -f -- "$grub_new_menu" "$output"
-    grub_new_menu=''
-    grub_config_pending=false
+    cmdline_backup=$backup
+    cmdline_pending=true
+    "$ESCALATION_TOOL" install -m 644 "$cmdline_work/defaults" "$cmdline_file"
+    if [ "$cmdline_backend" = limine ]; then
+        # The entry tool rewrites the entries from the new parameters and rebuilds
+        # the boot images on the way.
+        "$ESCALATION_TOOL" "$regenerate"
+        # Read by plymouth.sh, which otherwise rebuilds the boot images itself.
+        # shellcheck disable=SC2034
+        cmdline_rebuilt_initramfs=true
+    else
+        backup_system "$output"
+        cmdline_new_menu=$("$ESCALATION_TOOL" mktemp "$(dirname "$output")/.commander-grub.XXXXXX")
+        "$ESCALATION_TOOL" "$generator" -o "$cmdline_new_menu"
+        "$ESCALATION_TOOL" "$checker" "$cmdline_new_menu"
+        "$ESCALATION_TOOL" mv -f -- "$cmdline_new_menu" "$output"
+        cmdline_new_menu=''
+    fi
+    cmdline_pending=false
 }

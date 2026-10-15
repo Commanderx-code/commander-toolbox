@@ -46,11 +46,12 @@ this build with the stock application through the menu.
 | Applications Setup | Commander Workstation Setup | On Arch-based systems, clones the dotfiles repository (or updates the checkout under `~/github/projects/dotfiles`) and runs its guided `scripts/setup`: the whole workstation in one go, with the setup's own plan and `APPLY`. |
 | Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, the Ghostty preset with its palette files and Spotify profile, or Zellij. Existing settings are backed up or preserved. |
 | Applications Setup > Grub Theme | Commander GRUB Theme | Installs the Garuda dr460nized theme package the dotfiles GRUB settings use, while preserving current kernel/disk settings. Garuda repositories only. |
-| Applications Setup > Boot Splash | Commander Boot Splash / Boot Splash Theme / Enable / Disable | Select the Plymouth theme named in dotfiles, pick any installed theme, or turn the splash on or off through the GRUB kernel command line; each rebuilds the boot images with the distro's own tool. |
+| Applications Setup > Boot Splash | Commander Boot Splash / Boot Splash Theme / Enable / Disable | Select the Plymouth theme named in dotfiles, pick any installed theme, or turn the splash on or off through the kernel command line in `/etc/default/grub` or, on CachyOS, `/etc/default/limine`; each rebuilds the boot images with the distro's own tool. |
+| Applications Setup > Limine Boot Menu | Commander Limine Boot Menu | On a machine that boots with Limine, merges the dotfiles boot menu look (the CachyOS wallpaper and colours, a two-second timeout) into the global settings of `limine.conf`, leaving the boot entries alone. |
 | Applications Setup | SDDM Theme | Installs SilentSDDM with the dotfiles presets (Kratos by default), previews it, asks before activation, then offers to make SDDM the login screen. |
 | System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
 | System Setup | Commander Topgrade | Replaces the default Topgrade action with your adapted config and an optional update run. |
-| Security | AppArmor Setup and Status | Installs tools/profiles and starts AppArmor; on Arch with GRUB it first offers the `lsm=` kernel parameter the dotfiles boot settings carry. |
+| Security | AppArmor Setup and Status | Installs tools/profiles and starts AppArmor; on Arch with GRUB, or Limine with its entry tool, it first offers the `lsm=` kernel parameter the dotfiles boot settings carry. |
 | Security | Fedora SELinux Tools and Status | Installs policy/management tools and reports status without changing enforcement mode. |
 
 The custom installers target conventional Arch/Garuda, Fedora and Debian/Ubuntu
@@ -178,14 +179,19 @@ has not been validated on real hardware across the supported distros.
   next reboot; declining leaves the theme installed for whenever SDDM runs.
   Existing theme, fonts and configuration get adjacent backups; copied assets
   can remain after a cancelled preview.
-- Boot Splash entries need GRUB with `/etc/default/grub` to turn the splash on
-  or off; systemd-boot and Limine users edit the kernel command line themselves.
+- Boot Splash entries turn the splash on or off through the kernel command
+  line in `/etc/default/grub`, or in `/etc/default/limine` on a Limine machine
+  whose entries the Limine entry tool manages, as CachyOS installs are; with
+  systemd-boot or hand-written Limine entries, edit the command line yourself.
   Enabling installs Plymouth, adds `splash`, adds the `plymouth` hook to
   `/etc/mkinitcpio.conf` on mkinitcpio systems (drop-ins that set `HOOKS` must
-  be adjusted by hand), regenerates the menu with the same backup and syntax
+  be adjusted by hand), regenerates the GRUB menu with the same backup and syntax
   check as the GRUB themes, updates Fedora's boot entries with `grubby`, and
   rebuilds the boot images with `dracut-rebuild`, `mkinitcpio -P`,
-  `update-initramfs` or `dracut`, whichever the system uses. The theme chooser
+  `update-initramfs` or `dracut`, whichever the system uses. On Limine the
+  entry tool's `limine-mkinitcpio` (or `limine-dracut`) regenerates the entries
+  from the new parameters and rebuilds the boot images in one go; a failure
+  restores the previous `/etc/default/limine`. The theme chooser
   lists installed themes only; it rebuilds the boot images because the splash is
   read from them, which KDE's Boot Splash Screen page cannot do on dracut-based
   Arch systems such as Garuda. Disabling removes `splash` and `rhgb` and keeps
@@ -195,12 +201,22 @@ has not been validated on real hardware across the supported distros.
   copied in, and on Arch a `plymouth-theme-<name>` package is installed; a theme
   that only exists on the KDE Store, such as the current default, must be
   fetched with Get New first, and the entry says so.
-- AppArmor on an Arch-family system that boots with GRUB: when the running
-  kernel has not enabled it, the entry offers to set
-  `lsm=landlock,lockdown,yama,integrity,apparmor,bpf` in `/etc/default/grub`
-  (the parameter the dotfiles GRUB settings carry), regenerating the menu with
-  the same backups and syntax check as the themes, and stops; reboot and run it
-  again to install the tools and enable the service. Debian/Ubuntu kernels
+- Commander Limine Boot Menu is the Limine counterpart of the Commander GRUB
+  theme. Limine has no theme packages; its menu is styled by a few settings in
+  `limine.conf` (found through `ESP_PATH` in `/etc/default/limine` or under
+  `/boot`, `/efi` and `/boot/efi`). The entry copies the dotfiles wallpaper
+  beside that file as `dotfiles-splash.png` and merges the appearance settings
+  from the dotfiles `limine/limine.conf` into the global section, replacing the
+  same keys and keeping everything else, including the `/` boot entries that
+  the entry tool rewrites on kernel updates. Limine has no syntax checker, so
+  the safety net is the backup made before the write. The look is diegons490's
+  CachyOS Limine theme, GPL-3.0, kept in the dotfiles repository with its license.
+- AppArmor on an Arch-family system that boots with GRUB, or with Limine and
+  its entry tool: when the running kernel has not enabled it, the entry offers to
+  set `lsm=landlock,lockdown,yama,integrity,apparmor,bpf` in `/etc/default/grub`
+  or `/etc/default/limine` (the parameter the dotfiles boot settings carry),
+  regenerating the boot menu with the same backups as the themes, and stops;
+  reboot and run it again to install the tools and enable the service. Debian/Ubuntu kernels
   enable AppArmor already; elsewhere follow your distro's setup instructions
   and reboot first. Fedora keeps SELinux. Myfish's native backend avoids its automatic Nix installer's
   documented SELinux restriction.

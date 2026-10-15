@@ -97,8 +97,9 @@ if [ "$action" = dotfiles ]; then
 fi
 
 # Turning the splash on or off means editing the kernel command line, which
-# this installer only does through /etc/default/grub.
-grub_cmdline_setup 'Boot splash changes need GRUB with /etc/default/grub. With systemd-boot or Limine, add or remove "splash" on the kernel command line yourself; no changes made.'
+# this installer does through /etc/default/grub or, with the Limine entry tool,
+# /etc/default/limine.
+cmdline_setup 'Boot splash changes need GRUB with /etc/default/grub, or Limine with the entry tool and /etc/default/limine. With systemd-boot or hand-written Limine entries, add or remove "splash" on the kernel command line yourself; no changes made.'
 hook_file=''
 if [ "$tool" = 'mkinitcpio -P' ] && [ -f /etc/mkinitcpio.conf ]; then
     hook_file=/etc/mkinitcpio.conf
@@ -110,7 +111,7 @@ if [ "$tool" = 'mkinitcpio -P' ] && [ -f /etc/mkinitcpio.conf ]; then
         fi
     done
 fi
-trap grub_cmdline_cleanup 0
+trap cmdline_cleanup 0
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
@@ -121,26 +122,27 @@ if [ "$action" = on ]; then
     esac
     hook_note=''
     [ -n "$hook_file" ] && hook_note=", add the plymouth hook to $hook_file"
-    confirm "Install $packages, add 'splash' to the kernel command line in /etc/default/grub$hook_note, regenerate the GRUB menu and rebuild the boot images with '$tool'. Defaults, the boot menu and $hook_file are backed up first."
+    confirm "Install $packages, add 'splash' to the kernel command line in $cmdline_file$hook_note, regenerate the boot menu and rebuild the boot images with '$tool'. $cmdline_file, the boot menu and $hook_file are backed up first."
     # shellcheck disable=SC2086
     install_packages $packages
     if [ -n "$hook_file" ]; then
-        python3 ./configure.py mkinitcpio-hooks "$hook_file" add > "$grub_work/mkinitcpio.conf"
-        if ! cmp -s "$grub_work/mkinitcpio.conf" "$hook_file"; then
+        python3 ./configure.py mkinitcpio-hooks "$hook_file" add > "$cmdline_work/mkinitcpio.conf"
+        if ! cmp -s "$cmdline_work/mkinitcpio.conf" "$hook_file"; then
             backup_system "$hook_file"
-            "$ESCALATION_TOOL" install -m 644 "$grub_work/mkinitcpio.conf" "$hook_file"
+            "$ESCALATION_TOOL" install -m 644 "$cmdline_work/mkinitcpio.conf" "$hook_file"
         fi
     fi
-    grub_cmdline_apply add splash
+    cmdline_apply add splash
     if [ "$DTYPE" = fedora ] && command_exists grubby; then
         # Fedora's boot entries carry their own arguments, which grubby maintains.
         "$ESCALATION_TOOL" grubby --update-kernel=ALL --args=splash
     fi
-    rebuild_initramfs
+    # The Limine entry tool has already rebuilt the boot images with the new arguments.
+    [ "$cmdline_rebuilt_initramfs" = true ] || rebuild_initramfs
     printf '%s\n' 'Boot splash enabled from the next reboot. Pick a theme with the Boot Splash Theme entry.'
 else
-    confirm "Remove 'splash' and 'rhgb' from the kernel command line in /etc/default/grub and regenerate the GRUB menu, so the system boots with text output. Plymouth, its themes and its boot image hook stay installed. Defaults and the boot menu are backed up first."
-    grub_cmdline_apply remove splash rhgb
+    confirm "Remove 'splash' and 'rhgb' from the kernel command line in $cmdline_file and regenerate the boot menu, so the system boots with text output. Plymouth, its themes and its boot image hook stay installed. $cmdline_file and the boot menu are backed up first."
+    cmdline_apply remove splash rhgb
     if [ "$DTYPE" = fedora ] && command_exists grubby; then
         "$ESCALATION_TOOL" grubby --update-kernel=ALL --remove-args='splash rhgb'
     fi

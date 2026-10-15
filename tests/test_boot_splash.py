@@ -83,7 +83,7 @@ class BootSplashScriptTests(unittest.TestCase):
         self.themes.mkdir(parents=True)
         for name in ('plymouth.sh', 'kernel-cmdline.sh'):
             script = (TOOLS / name).read_text()
-            for path in ('/etc/default/grub', '/boot/grub', '/etc/mkinitcpio.conf', '/usr/share/plymouth/themes'):
+            for path in ('/etc/default/grub', '/etc/default/limine', '/boot/grub', '/etc/mkinitcpio.conf', '/usr/share/plymouth/themes'):
                 script = script.replace(path, str(self.root) + path)
             (self.root / name).write_text(script)
         self.source = self.root / 'dotfiles'
@@ -201,6 +201,39 @@ fetch_source() {{ source_dir="{self.source}"; }}
         result = self.run_script('dotfiles', ['dracut-rebuild'])
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.calls(), [])
+
+    def test_limine_entries_get_the_argument_through_the_entry_tool(self):
+        self.defaults.unlink()
+        limine = self.root / 'etc/default/limine'
+        limine.write_text('ESP_PATH="/boot"\nKERNEL_CMDLINE[default]="quiet"\n')
+        self.write_tool('limine-mkinitcpio', 'echo "limine-mkinitcpio $*" >> "$CALLS"')
+        result = self.run_script('on', ['mkinitcpio', 'limine-mkinitcpio'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(limine.read_text(), 'ESP_PATH="/boot"\nKERNEL_CMDLINE[default]="quiet splash"\n')
+        self.assertEqual(self.hooks.read_text(), 'HOOKS=(base udev plymouth autodetect filesystems)\n')
+        self.assertTrue(limine.with_name('limine.backup').is_file())
+        # The entry tool rebuilt the boot images; mkinitcpio is not run a second time.
+        self.assertEqual(self.calls(), ['install plymouth', 'limine-mkinitcpio '])
+        self.assertEqual(self.menu.read_text(), 'original boot menu')
+        self.log.unlink()
+        result = self.run_script('off', ['mkinitcpio', 'limine-mkinitcpio'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(limine.read_text(), 'ESP_PATH="/boot"\nKERNEL_CMDLINE[default]="quiet"\n')
+        self.assertEqual(self.calls(), ['limine-mkinitcpio '])
+
+    def test_limine_without_the_entry_tool_or_its_cmdline_line_changes_nothing(self):
+        self.defaults.unlink()
+        limine = self.root / 'etc/default/limine'
+        limine.write_text('ESP_PATH="/boot"\n')
+        result = self.run_script('on', ['mkinitcpio'])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('entry tool', result.stderr)
+        self.write_tool('limine-mkinitcpio', 'echo "limine-mkinitcpio $*" >> "$CALLS"')
+        result = self.run_script('on', ['mkinitcpio', 'limine-mkinitcpio'])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('KERNEL_CMDLINE[default]', result.stderr)
+        self.assertEqual(limine.read_text(), 'ESP_PATH="/boot"\n')
+        self.assertNotIn('limine-mkinitcpio ', self.calls())
 
     def test_without_an_initramfs_tool_nothing_changes(self):
         result = self.run_script('on', ['grub-mkconfig'])
