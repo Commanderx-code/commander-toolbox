@@ -89,7 +89,7 @@ if [ "$action" = dotfiles ]; then
     fi
     confirm "Select the '$theme' boot splash ($origin) and rebuild the boot images with '$tool'. Kernel arguments are not changed."
     case "$origin" in
-        copied*) "$ESCALATION_TOOL" cp -r -- "$source_dir/plymouth/themes/$theme" "$themes_dir/" ;;
+        copied*) "$ESCALATION_TOOL" cp -R --no-preserve=all -- "$source_dir/plymouth/themes/$theme" "$themes_dir/" ;;
         installed*) install_packages "plymouth-theme-$theme" ;;
     esac
     select_theme "$theme"

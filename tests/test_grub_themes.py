@@ -59,8 +59,12 @@ class GrubThemeTests(unittest.TestCase):
             boot.mkdir(parents=True)
             menu = boot / 'grub.cfg'
             menu.write_text('original boot menu')
+            garuda_theme = root / 'usr/share/grub/themes/garuda-dr460nized'
+            garuda_theme.mkdir(parents=True)
+            (garuda_theme / 'theme.txt').write_text('title-text: ""')
             script = (TOOLS / 'grub.sh').read_text()
             script = script.replace('/etc/default/grub', str(defaults)).replace('/boot/grub', str(boot))
+            script = script.replace('/usr/share/grub/themes/garuda-dr460nized', str(garuda_theme))
             (root / 'grub.sh').write_text(script)
             shutil.copy2(TOOLS / 'configure.py', root / 'configure.py')
             (root / 'common.sh').write_text('''commander_init() { DTYPE=debian; PACKAGER=pacman; ESCALATION_TOOL=env; }
@@ -93,7 +97,7 @@ backup_system() { backup="$1.backup"; cp -a "$1" "$backup"; }
                 self.assertFalse((root / 'calls.log').exists())
             elif variant == 'commander':
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn('GRUB_THEME="/usr/share/grub/themes/garuda-dr460nized/theme.txt"', defaults.read_text())
+                self.assertIn(f'GRUB_THEME="{garuda_theme}/theme.txt"', defaults.read_text())
                 self.assertIn('GRUB_TERMINAL_OUTPUT="gfxterm"', defaults.read_text())
                 self.assertIn('keep-me', defaults.read_text())
                 self.assertEqual(menu.read_text(), 'new menu')

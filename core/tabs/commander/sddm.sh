@@ -48,13 +48,15 @@ case "$theme_origin" in
     SilentSDDM*)
         fetch_source silentsddm
         "$ESCALATION_TOOL" mkdir -p "$theme"
+        # Copies belong to root with default permissions, not to the user who
+        # fetched the source; the greeter reads them as a system theme.
         for item in Main.qml qmldir metadata.desktop LICENSE test.sh change_avatar.sh backgrounds components configs fonts icons; do
-            "$ESCALATION_TOOL" cp -a -- "$source_dir/$item" "$theme/"
+            "$ESCALATION_TOOL" cp -R --no-preserve=all -- "$source_dir/$item" "$theme/"
         done
         # The presets name the Red Hat fonts the theme ships.
         backup_system "$fonts"
         "$ESCALATION_TOOL" mkdir -p "$fonts"
-        "$ESCALATION_TOOL" cp -a -- "$source_dir/fonts/redhat" "$source_dir/fonts/redhat-vf" "$fonts/"
+        "$ESCALATION_TOOL" cp -R --no-preserve=all -- "$source_dir/fonts/redhat" "$source_dir/fonts/redhat-vf" "$fonts/"
         if command_exists fc-cache; then "$ESCALATION_TOOL" fc-cache -f "$fonts"; fi
         ;;
 esac
