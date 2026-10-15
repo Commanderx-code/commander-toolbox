@@ -9,6 +9,14 @@ case "$variant" in
     *) printf '%s\n' 'Unknown GRUB theme.' >&2; exit 1 ;;
 esac
 [ -f /etc/default/grub ] || { printf '%s\n' 'An existing GRUB installation is required.'; exit 1; }
+# The Commander theme is the Garuda dr460nized theme the dotfiles GRUB settings
+# name, a package in the Garuda repositories rather than files in the repository.
+garuda_theme_package=grub-theme-garuda-dr460nized
+garuda_theme=/usr/share/grub/themes/garuda-dr460nized
+if [ "$variant" = commander ] && ! { [ "$PACKAGER" = pacman ] && pacman -Si "$garuda_theme_package" >/dev/null 2>&1; }; then
+    printf 'The Commander theme is the %s package from the Garuda repositories, which this system does not have. Pick one of the other GRUB themes.\n' "$garuda_theme_package" >&2
+    exit 1
+fi
 if [ "$DTYPE" = fedora ]; then
     generator=grub2-mkconfig
     checker=grub2-script-check
@@ -45,11 +53,13 @@ case "$variant" in
 esac
 if [ "$variant" = default ]; then
     confirm 'Restore plain GRUB: disable custom theme/background and select console output. Preserve kernel arguments, disk settings and boot entries. Back up defaults and the boot menu first.'
+elif [ "$variant" = commander ]; then
+    confirm "Install the $garuda_theme_package package and select its theme with graphical output. Preserve kernel arguments and disk settings. Back up defaults and the boot menu before regenerating."
+    install_packages "$garuda_theme_package"
 else
     confirm "Install the $variant GRUB theme with graphical output. Preserve kernel arguments and disk settings. Back up defaults, theme and boot menu before regenerating."
     command_exists git || install_packages git
     case "$variant" in
-        commander) fetch_source dotfiles ;;
         catppuccin) fetch_source grub-catppuccin ;;
         dracula) fetch_source grub-dracula ;;
         tela | vimix) fetch_source grub-vince ;;
@@ -80,6 +90,9 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 if [ "$variant" = default ]; then
     python3 ./configure.py grub /etc/default/grub '' '' > "$work/defaults"
+elif [ "$variant" = commander ]; then
+    [ -f "$garuda_theme/theme.txt" ] || { printf 'The package did not provide %s/theme.txt; no changes made.\n' "$garuda_theme" >&2; exit 1; }
+    python3 ./configure.py grub /etc/default/grub "$garuda_theme/theme.txt" '' > "$work/defaults"
 else
     theme="$(dirname "$output")/themes/commander-$variant-$(date +%Y%m%d%H%M%S)-$$"
     python3 ./configure.py grub-prepare "$source_dir" "$work/theme" "$variant" "$resolution"

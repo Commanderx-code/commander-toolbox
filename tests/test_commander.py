@@ -41,9 +41,39 @@ repos = [@DOTFILES_DIRECTORY@]
         rendered = configure.render_sddm('[Autologin]\nUser=test\n[Theme]\nCurrent=old\n[General]\nGreeterEnvironment=FOO=bar,QT_IM_MODULE=old\n')
         self.assertIn('User=test', rendered)
         self.assertIn('FOO=bar', rendered)
-        self.assertIn('Current=commander-silent', rendered)
+        self.assertIn('Current=silent', rendered)
+        self.assertIn('QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/', rendered)
         self.assertEqual(rendered.count('QT_IM_MODULE='), 1)
         self.assertEqual(configure.render_sddm(rendered), rendered)
+
+    def test_ghostty_preset_and_palette_files_follow_rice_json(self):
+        palette = {'name': 'Nord', 'colors': {'base': '#2e3440', 'mantle': '#272c36', 'text': '#eceff4'},
+                   'terminal': {'ansi': [f'#{index:06x}' for index in range(16)], 'cursor': '#d8dee9',
+                                'cursorText': '#2e3440', 'selection': '#434c5e', 'selectionText': '#eceff4'}}
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, config = Path(tmp) / 'repo', Path(tmp) / 'config'
+            (repo / 'configs/ghostty').mkdir(parents=True)
+            (repo / 'configs/themes').mkdir()
+            (repo / 'home-manager').mkdir()
+            (repo / 'configs/ghostty/config').write_text('theme = commander\n')
+            (repo / 'configs/ghostty/spotatui.conf').write_text('spotify\n')
+            (repo / 'configs/themes/nord.json').write_text(json.dumps(palette))
+            (repo / 'home-manager/rice.json').write_text('{"theme": "nord"}')
+            (config / 'ghostty').mkdir(parents=True)
+            (config / 'ghostty/config').write_text('personal')
+            configure.install_dotfiles(repo, 'ghostty', config, Path(tmp) / 'data')
+            self.assertEqual((config / 'ghostty/config').read_text(), 'theme = commander\n')
+            self.assertEqual(next((config / 'ghostty').glob('config.commander-backup-*')).read_text(), 'personal')
+            theme = (config / 'ghostty/themes/commander').read_text()
+            self.assertIn('palette = 0=#000000', theme)
+            self.assertIn('palette = 15=#00000f', theme)
+            self.assertIn('background = #2e3440', theme)
+            self.assertIn('selection-foreground = #eceff4', theme)
+            self.assertIn('background-color: #272c36', (config / 'ghostty/topbar.css').read_text())
+            self.assertEqual((config / 'ghostty/spotatui.conf').read_text(), 'spotify\n')
+            (repo / 'home-manager/rice.json').write_text('{"theme": "../etc"}')
+            with self.assertRaises(ValueError):
+                configure.load_palette(repo)
 
     def test_existing_file_is_backed_up(self):
         with tempfile.TemporaryDirectory() as tmp:

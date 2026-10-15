@@ -28,6 +28,12 @@ class GrubThemeTests(unittest.TestCase):
             self.assertEqual((target / 'background.png').read_bytes(), b'theme image')
             self.assertEqual((target / 'LICENSE').read_text(), 'source license')
 
+    def test_commander_theme_is_not_prepared_from_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                configure.prepare_grub_theme(Path(tmp), Path(tmp) / 'prepared', 'commander')
+            self.assertFalse((Path(tmp) / 'prepared').exists())
+
     def test_default_restores_plain_appearance_only(self):
         original = 'GRUB_THEME="old"\nGRUB_BACKGROUND="old.png"\nGRUB_TERMINAL_OUTPUT="gfxterm"\nGRUB_TIMEOUT=7\nGRUB_CMDLINE_LINUX="root=UUID=target quiet"\n'
         restored = configure.render_grub(original, '', '')
@@ -42,7 +48,7 @@ class GrubThemeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             configure.render_grub('GRUB_TERMINAL="serial"\n')
 
-    def run_transaction(self, failure=None):
+    def run_transaction(self, failure=None, variant='default', package_available=True):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             defaults = root / 'etc/default/grub'
@@ -57,12 +63,16 @@ class GrubThemeTests(unittest.TestCase):
             script = script.replace('/etc/default/grub', str(defaults)).replace('/boot/grub', str(boot))
             (root / 'grub.sh').write_text(script)
             shutil.copy2(TOOLS / 'configure.py', root / 'configure.py')
-            (root / 'common.sh').write_text('''commander_init() { DTYPE=debian; ESCALATION_TOOL=env; }
+            (root / 'common.sh').write_text('''commander_init() { DTYPE=debian; PACKAGER=pacman; ESCALATION_TOOL=env; }
 checkCommandRequirements() { :; }
 command_exists() { return 0; }
 confirm() { :; }
+install_packages() { echo "install $*" >> ./calls.log; }
 backup_system() { backup="$1.backup"; cp -a "$1" "$backup"; }
 ''')
+            pacman = root / 'pacman'
+            pacman.write_text('#!/bin/sh\nexit ' + ('0' if package_available else '1') + '\n')
+            pacman.chmod(0o755)
             for name in ('grub-mkconfig', 'grub-script-check'):
                 executable = root / name
                 if (failure == 'generate' and name == 'grub-mkconfig') or (failure == 'check' and name == 'grub-script-check'):
@@ -73,13 +83,21 @@ backup_system() { backup="$1.backup"; cp -a "$1" "$backup"; }
                     executable.write_text('#!/bin/sh\nexit 0\n')
                 executable.chmod(0o755)
             import os
-            result = subprocess.run(['sh', '-e', './grub.sh', 'default'], cwd=root,
+            result = subprocess.run(['sh', '-e', './grub.sh', variant], cwd=root,
                                     env=dict(os.environ, PATH=str(root) + ':' + os.environ['PATH']),
                                     text=True, capture_output=True)
-            if failure:
+            if failure or not package_available:
                 self.assertNotEqual(result.returncode, 0, result.stdout)
                 self.assertEqual(defaults.read_text(), original)
                 self.assertEqual(menu.read_text(), 'original boot menu')
+                self.assertFalse((root / 'calls.log').exists())
+            elif variant == 'commander':
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn('GRUB_THEME="/usr/share/grub/themes/garuda-dr460nized/theme.txt"', defaults.read_text())
+                self.assertIn('GRUB_TERMINAL_OUTPUT="gfxterm"', defaults.read_text())
+                self.assertIn('keep-me', defaults.read_text())
+                self.assertEqual(menu.read_text(), 'new menu')
+                self.assertEqual((root / 'calls.log').read_text(), 'install grub-theme-garuda-dr460nized\n')
             else:
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn('GRUB_THEME=""', defaults.read_text())
@@ -95,3 +113,9 @@ backup_system() { backup="$1.backup"; cp -a "$1" "$backup"; }
 
     def test_success_replaces_menu(self):
         self.run_transaction()
+
+    def test_commander_theme_installs_the_garuda_package(self):
+        self.run_transaction(variant='commander')
+
+    def test_commander_theme_needs_the_garuda_repositories(self):
+        self.run_transaction(variant='commander', package_available=False)

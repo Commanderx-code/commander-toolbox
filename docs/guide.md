@@ -32,13 +32,14 @@ this build with the stock application through the menu.
 | Applications Setup > Design Tools | DaVinci Resolve - Native / Davincibox | Install Resolve directly or in a dependency container on Fedora/Arch or Debian/Ubuntu; see the [Resolve guide](resolve.md). |
 | Applications Setup | Myfish Shell Setup | Open the submenu for native Fish, Bash or Zsh, or Guided Setup to choose the backend interactively. |
 | Applications Setup > Dotfiles | Zellij Terminal Sessions | Install Zellij if missing; create a Tokyo Night Storm/locked-mode preset only when no configuration exists. No shell reinstallation or automatic startup. |
-| Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, optional Ghostty profile or Zellij. Existing settings are backed up or preserved. |
-| Applications Setup > Grub Theme | Commander GRUB Theme | Installs your CachyOS-based theme while preserving current kernel/disk settings. |
-| Applications Setup > Boot Splash | Boot Splash Theme / Enable / Disable | Pick an installed Plymouth theme and rebuild the boot images with the distro's own tool, or turn the splash on or off through the GRUB kernel command line. |
-| Applications Setup | SDDM Theme | Installs the dedicated `sddm/` SilentSDDM Revan preset, previews it, then asks before activation. |
+| Applications Setup | Commander Workstation Setup | On Arch-based systems, clones the dotfiles repository (or updates the checkout under `~/github/projects/dotfiles`) and runs its guided `scripts/setup`: the whole workstation in one go, with the setup's own plan and `APPLY`. |
+| Applications Setup | Dotfiles | Open the submenu and select Neovim, Fastfetch, Starship, Konsole profile/colors, the Ghostty preset with its palette files and Spotify profile, or Zellij. Existing settings are backed up or preserved. |
+| Applications Setup > Grub Theme | Commander GRUB Theme | Installs the Garuda dr460nized theme package the dotfiles GRUB settings use, while preserving current kernel/disk settings. Garuda repositories only. |
+| Applications Setup > Boot Splash | Commander Boot Splash / Boot Splash Theme / Enable / Disable | Select the Plymouth theme named in dotfiles, pick any installed theme, or turn the splash on or off through the GRUB kernel command line; each rebuilds the boot images with the distro's own tool. |
+| Applications Setup | SDDM Theme | Installs SilentSDDM with the dotfiles presets (Kratos by default), previews it, asks before activation, then offers to make SDDM the login screen. |
 | System Setup > Debian / Ubuntu | Nala Package Manager | Install Nala and add an interactive `apt` alias for Bash, Zsh or Fish, with backups. |
 | System Setup | Commander Topgrade | Replaces the default Topgrade action with your adapted config and an optional update run. |
-| Security | AppArmor Setup and Status | Installs tools/profiles and starts AppArmor on supported systems with an already-enabled kernel. |
+| Security | AppArmor Setup and Status | Installs tools/profiles and starts AppArmor; on Arch with GRUB it first offers the `lsm=` kernel parameter the dotfiles boot settings carry. |
 | Security | Fedora SELinux Tools and Status | Installs policy/management tools and reports status without changing enforcement mode. |
 
 The custom installers target conventional Arch/Garuda, Fedora and Debian/Ubuntu
@@ -46,8 +47,8 @@ systems. They reject OSTree/Atomic systems. Feature-specific checks may narrow
 support further. Python 3 is required for configuration installers; Git is
 installed through the native package manager when missing.
 
-Myfish and dotfiles are downloaded at explicit Git commit IDs recorded in
-`core/tabs/commander/common.sh`. Downloads live under
+Myfish, dotfiles and SilentSDDM are downloaded at explicit Git commit IDs
+recorded in `core/tabs/commander/common.sh`. Downloads live under
 `$XDG_DATA_HOME/commander-linutil/sources` (normally `~/.local/share/...`).
 Cached revisions and local edits are checked before reuse. The source-sync
 workflow checks dotfiles and Myfish at minutes 17 and 47 each hour and adopts a
@@ -86,7 +87,20 @@ has not been validated on real hardware across the supported distros.
   it does not activate your complete Garuda Home Manager profile, Restic
   services, machine settings, or system snapshots. Fastfetch is installed when missing; install other application packages
   separately. Neovim's plugins and Konsole's configured font may need their
-  normal first-run setup.
+  normal first-run setup. The Ghostty entry installs the starting preset as
+  `~/.config/ghostty/config` together with the palette theme and tab-bar CSS
+  that Home Manager would generate from `configs/themes/` (the palette named in
+  `home-manager/rice.json`), plus the Spotify profile; the preset's MesloLGS
+  Nerd Font is not installed. Zed's settings stay out of the toolbox because
+  they name language servers by their Nix profile path.
+- Commander Workstation Setup is the whole dotfiles setup rather than a
+  component: it clones `Commanderx-code/dotfiles` to `~/github/projects/dotfiles`
+  (`COMMANDER_DOTFILES_DIR` chooses another path, and an existing checkout there,
+  a fork included, is fast-forwarded instead) and runs `scripts/setup`, which asks
+  its own questions, installs with pacman, Nix and Home Manager, and waits for its
+  own `APPLY`. The checkout stays a normal clone for `hm-rebuild` and `git pull`
+  afterwards. The setup script needs pacman, so the entry appears on Arch-based
+  systems only; other distributions take the pieces from the entries above.
 - User configuration files/directories receive adjacent timestamped backups.
   Symlink-managed destinations (including Home Manager) are rejected: update
   their owning configuration instead. A failed copy restores the previous target.
@@ -115,10 +129,16 @@ has not been validated on real hardware across the supported distros.
   backs up the existing Fastfetch configuration, launcher and shell startup file.
   Remove the marked shell shortcut and restore those backups to undo installation.
 - GRUB requires an existing installation and its menu generator/syntax checker.
-  Themes include your custom theme, Catppuccin Mocha, Dracula, Tela, Vimix,
+  Themes include the Commander theme, Catppuccin Mocha, Dracula, Tela, Vimix,
   and seven presets from ChrisTitusTech/bootloader-themes.
-  Assets are fetched at pinned commits and installed under the active GRUB boot
-  directory, so a separate `/boot` can access them. Tela/Vimix offer 1080p, 2K
+  Downloaded assets are fetched at pinned commits and installed under the active
+  GRUB boot directory, so a separate `/boot` can access them. The Commander
+  theme is the Garuda dr460nized theme named in the dotfiles GRUB settings; it
+  comes from the `grub-theme-garuda-dr460nized` package and stays at its package
+  location under `/usr/share/grub/themes`, so the entry needs the Garuda
+  repositories. The dotfiles `restore-grub` installs the complete settings file
+  (menu timeout, resolution, AppArmor parameter); the toolbox changes appearance
+  only. Tela/Vimix offer 1080p, 2K
   and 4K asset sizes. The installer enables graphical terminal output; explicit
   `GRUB_TERMINAL` settings and conflicting appearance drop-ins require manual
   resolution first. Existing kernel, disk, timeout and boot-entry settings stay.
@@ -129,10 +149,22 @@ has not been validated on real hardware across the supported distros.
   settings and selects the plain console menu; it does not recover an original
   distro-branded theme or reinstall the bootloader. Theme files remain available
   if you want to reapply one.
-- SDDM requires 0.21+, the Qt6 greeter, an existing SDDM setup and a graphical
-  desktop session. The preview must work before activation. A late drop-in is
-  installed; `/etc/sddm.conf`, when present, is also backed up and its theme
-  settings updated because it takes precedence. SDDM is never restarted.
+- SDDM requires 0.21+, the Qt6 greeter, SDDM installed and a graphical desktop
+  session. The entry installs SilentSDDM 1.5.1 from its pinned source at
+  `/usr/share/sddm/themes/silent` (when an AUR `sddm-silent-theme` package
+  already owns that directory, the package stays and only the presets are
+  added), copies its Red Hat fonts to `/usr/local/share/fonts/silent-sddm`, and
+  puts the dotfiles presets on top: the preset files and backgrounds from
+  `sddm/`, the customised login screen and battery components, and
+  `metadata.desktop`, which selects the Kratos preset. The preview must work
+  before activation. The Num Lock and greeter-environment snippets from
+  `sddm/sddm-conf/` and a late `zz-commander-theme.conf` drop-in are installed;
+  `/etc/sddm.conf`, when present, is also backed up and its theme settings
+  updated because it takes precedence. The dotfiles `kde_settings.conf`, which
+  turns automatic login off, is not copied. SDDM is never restarted. When
+  another display manager runs the login screen, as Plasma Login Manager does on
+  newer Garuda installs, the entry offers to disable it and enable SDDM at the
+  next reboot; declining leaves the theme installed for whenever SDDM runs.
   Existing theme, fonts and configuration get adjacent backups; copied assets
   can remain after a cancelled preview.
 - Boot Splash entries need GRUB with `/etc/default/grub` to turn the splash on
@@ -146,10 +178,20 @@ has not been validated on real hardware across the supported distros.
   lists installed themes only; it rebuilds the boot images because the splash is
   read from them, which KDE's Boot Splash Screen page cannot do on dracut-based
   Arch systems such as Garuda. Disabling removes `splash` and `rhgb` and keeps
-  Plymouth installed.
-- AppArmor does not edit boot arguments. If the kernel has not enabled it,
-  follow your distro's setup instructions and reboot first. Fedora keeps
-  SELinux. Myfish's native backend avoids its automatic Nix installer's
+  Plymouth installed. Commander Boot Splash reads the theme name from the
+  dotfiles `plymouth/theme`, the way `restore-plymouth` does: an installed theme
+  is selected, a theme kept under `plymouth/themes/` in the repository is
+  copied in, and on Arch a `plymouth-theme-<name>` package is installed; a theme
+  that only exists on the KDE Store, such as the current default, must be
+  fetched with Get New first, and the entry says so.
+- AppArmor on an Arch-family system that boots with GRUB: when the running
+  kernel has not enabled it, the entry offers to set
+  `lsm=landlock,lockdown,yama,integrity,apparmor,bpf` in `/etc/default/grub`
+  (the parameter the dotfiles GRUB settings carry), regenerating the menu with
+  the same backups and syntax check as the themes, and stops; reboot and run it
+  again to install the tools and enable the service. Debian/Ubuntu kernels
+  enable AppArmor already; elsewhere follow your distro's setup instructions
+  and reboot first. Fedora keeps SELinux. Myfish's native backend avoids its automatic Nix installer's
   documented SELinux restriction.
 
 Theme files remain in the source dotfiles repository and retain their own

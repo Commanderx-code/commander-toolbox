@@ -68,7 +68,7 @@ def validate_checkout(source, root, document):
             'dotfiles-fastfetch': ['configs/fastfetch/config.jsonc', 'configs/fastfetch/png/arch.png'],
             'dotfiles-starship': ['configs/starship/starship.toml'],
             'dotfiles-konsole': ['configs/konsole/Garuda.profile', 'configs/konsole/Sweet.colorscheme'],
-            'dotfiles-ghostty': ['configs/ghostty/spotatui.conf'],
+            'dotfiles-ghostty': ['configs/ghostty/config', 'configs/ghostty/spotatui.conf', 'configs/themes/eldritch.json'],
             'zellij': [],
             'netwatch': ['home-manager/flake.nix', 'home-manager/terminal-tools.nix'],
             'tfm': ['home-manager/flake.nix', 'home-manager/terminal-tools.nix'],
@@ -79,7 +79,8 @@ def validate_checkout(source, root, document):
                 for path in required[entry['handler']]:
                     source_path(root, path)
         # These integrations consume the same dotfiles pin outside the exported submenu.
-        for path in ('configs/topgrade/topgrade.toml', 'sddm/Main.qml', 'sddm/configs/revan.conf'):
+        for path in ('configs/topgrade/topgrade.toml', 'sddm/metadata.desktop', 'sddm/configs/kratos.conf',
+                     'sddm/sddm-conf/20-silent.conf', 'plymouth/theme'):
             source_path(root, path)
 
 

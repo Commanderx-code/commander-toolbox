@@ -80,8 +80,8 @@ CTT_GRUB_THEMES = {'ctt-cyberre': 'CyberRe', 'ctt-cyberpunk': 'Cyberpunk', 'ctt-
 
 def prepare_grub_theme(repo, destination, variant, resolution='1080p'):
     if variant == 'commander':
-        source = repo / 'system-backup/grub/cachyos'
-    elif variant == 'catppuccin':
+        raise ValueError('The Commander theme comes from the grub-theme-garuda-dr460nized package.')
+    if variant == 'catppuccin':
         source = repo / 'src/catppuccin-mocha-grub-theme'
     elif variant == 'dracula':
         source = repo / 'dracula'
@@ -132,6 +132,10 @@ def render_kernel_cmdline(text, action, words):
         updated = current + [word for word in words if word not in current]
     elif action == 'remove':
         updated = [word for word in current if word not in words]
+    elif action == 'set':
+        keys = {word.split('=', 1)[0] for word in words if '=' in word}
+        updated = [word for word in current
+                   if word not in words and not ('=' in word and word.split('=', 1)[0] in keys)] + list(words)
     else:
         raise ValueError('Unknown kernel argument action.')
     value = json.dumps(' '.join(updated), ensure_ascii=False)
@@ -173,12 +177,12 @@ def render_sddm(text):
     for section in ('Theme', 'General'):
         if not parser.has_section(section):
             parser.add_section(section)
-    parser['Theme']['Current'] = 'commander-silent'
+    parser['Theme']['Current'] = 'silent'
     parser['General']['InputMethod'] = 'qtvirtualkeyboard'
     # Preserve unrelated greeter variables such as renderer settings.
     env = parser['General'].get('GreeterEnvironment', '').split(',')
     replacements = {
-        'QML2_IMPORT_PATH': '/usr/share/sddm/themes/commander-silent/components/',
+        'QML2_IMPORT_PATH': '/usr/share/sddm/themes/silent/components/',
         'QT_IM_MODULE': 'qtvirtualkeyboard', 'QML_XHR_ALLOW_FILE_READ': '1',
     }
     env = [item for item in env if item and item.split('=', 1)[0] not in replacements]
@@ -187,6 +191,35 @@ def render_sddm(text):
     output = io.StringIO()
     parser.write(output, space_around_delimiters=False)
     return output.getvalue()
+
+
+def load_palette(repo):
+    # rice.json names the palette in use; its JSON file holds every colour.
+    name = 'eldritch'
+    selection = repo / 'home-manager/rice.json'
+    if selection.is_file():
+        name = json.loads(selection.read_text()).get('theme', name)
+    if not re.fullmatch(r'[a-z0-9-]+', name):
+        raise ValueError(f'Unexpected palette name: {name}')
+    return json.loads((repo / 'configs/themes' / f'{name}.json').read_text()), name
+
+
+def render_ghostty_theme(palette, name):
+    terminal, colors = palette['terminal'], palette['colors']
+    lines = [f'# Generated from configs/themes/{name}.json by Commander Toolbox.']
+    lines += [f'palette = {index}={color}' for index, color in enumerate(terminal['ansi'])]
+    lines += [f'background = {colors["base"]}', f'foreground = {colors["text"]}',
+              f'cursor-color = {terminal["cursor"]}', f'cursor-text = {terminal["cursorText"]}',
+              f'selection-background = {terminal["selection"]}',
+              f'selection-foreground = {terminal["selectionText"]}']
+    return '\n'.join(lines) + '\n'
+
+
+def render_ghostty_css(palette, name):
+    return (f'/* Generated from configs/themes/{name}.json: opaque tab/title bar; the terminal keeps its transparency. */\n'
+            'headerbar,\ntoolbarview > .top-bar {\n'
+            f'    background-color: {palette["colors"]["mantle"]};\n'
+            '    background-image: none;\n}\n')
 
 
 def install_dotfiles(repo, component, config, data):
@@ -200,7 +233,20 @@ def install_dotfiles(repo, component, config, data):
     elif component == 'starship':
         deploy(source / 'starship.toml', config / 'starship.toml')
     elif component == 'ghostty':
-        deploy(source / 'spotatui.conf', config / 'ghostty' / 'spotatui.conf')
+        palette, name = load_palette(repo)
+        targets = {'config': source / 'config', 'spotatui.conf': source / 'spotatui.conf',
+                   'themes/commander': render_ghostty_theme(palette, name),
+                   'topbar.css': render_ghostty_css(palette, name)}
+        for target in targets:
+            check_destination(config / 'ghostty' / target)
+        for target, content in targets.items():
+            if isinstance(content, Path):
+                deploy(content, config / 'ghostty' / target)
+            else:
+                deploy(None, config / 'ghostty' / target, content)
+        if (config / 'ghostty/config.ghostty').exists():
+            print('Ghostty also reads config.ghostty; merge or remove it so the preset applies.')
+        print('The preset uses MesloLGS Nerd Font; install it, or change font-family in the config, and reload with Ctrl+Shift+,.')
     elif component == 'nvim':
         deploy(source, config / component)
     elif component == 'fastfetch':

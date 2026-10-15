@@ -32,6 +32,14 @@ class KernelArgumentTests(unittest.TestCase):
         rendered = configure.render_kernel_cmdline(original, 'add', ['splash'])
         self.assertEqual(rendered, 'GRUB_CMDLINE_LINUX_DEFAULT="old"\nexport GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"\n')
 
+    def test_set_replaces_words_with_the_same_key(self):
+        original = 'GRUB_CMDLINE_LINUX_DEFAULT="quiet lsm=landlock,yama splash"\n'
+        rendered = configure.render_kernel_cmdline(original, 'set', ['lsm=landlock,lockdown,yama,integrity,apparmor,bpf'])
+        self.assertEqual(rendered, 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash lsm=landlock,lockdown,yama,integrity,apparmor,bpf"\n')
+        self.assertEqual(configure.render_kernel_cmdline(rendered, 'set', ['lsm=landlock,lockdown,yama,integrity,apparmor,bpf']), rendered)
+        self.assertEqual(configure.render_kernel_cmdline('GRUB_CMDLINE_LINUX_DEFAULT="lsm"\n', 'set', ['lsm=apparmor']),
+                         'GRUB_CMDLINE_LINUX_DEFAULT="lsm lsm=apparmor"\n')
+
     def test_unknown_actions_and_broken_quoting_are_refused(self):
         with self.assertRaises(ValueError):
             configure.render_kernel_cmdline('', 'toggle', ['splash'])
@@ -71,10 +79,16 @@ class BootSplashScriptTests(unittest.TestCase):
         self.hooks = self.root / 'etc/mkinitcpio.conf'
         self.hooks.write_text('HOOKS=(base udev autodetect filesystems)\n')
         self.log = self.root / 'calls.log'
-        script = (TOOLS / 'plymouth.sh').read_text()
-        for path in ('/etc/default/grub', '/boot/grub', '/etc/mkinitcpio.conf'):
-            script = script.replace(path, str(self.root) + path)
-        (self.root / 'plymouth.sh').write_text(script)
+        self.themes = self.root / 'usr/share/plymouth/themes'
+        self.themes.mkdir(parents=True)
+        for name in ('plymouth.sh', 'kernel-cmdline.sh'):
+            script = (TOOLS / name).read_text()
+            for path in ('/etc/default/grub', '/boot/grub', '/etc/mkinitcpio.conf', '/usr/share/plymouth/themes'):
+                script = script.replace(path, str(self.root) + path)
+            (self.root / name).write_text(script)
+        self.source = self.root / 'dotfiles'
+        (self.source / 'plymouth').mkdir(parents=True)
+        (self.source / 'plymouth/theme').write_text('garuda-mac-style-purple\n')
         shutil.copy2(TOOLS / 'configure.py', self.root / 'configure.py')
         self.write_tool('grub-mkconfig', 'printf "new menu" > "$2"')
         self.write_tool('grub-script-check', 'exit 0')
@@ -90,13 +104,14 @@ class BootSplashScriptTests(unittest.TestCase):
 
     def run_script(self, action, tools, stdin=''):
         # The fake helpers answer every confirmation and know only the listed tools.
-        known = '|'.join(tools)
+        known = '|'.join(tools + ['git'])
         (self.root / 'common.sh').write_text(f'''commander_init() {{ DTYPE=arch; PACKAGER=pacman; ESCALATION_TOOL=env; }}
 checkCommandRequirements() {{ :; }}
 command_exists() {{ case "$1" in {known}) return 0 ;; *) return 1 ;; esac; }}
 confirm() {{ :; }}
 install_packages() {{ echo "install $*" >> "$CALLS"; }}
 backup_system() {{ backup="$1.backup"; cp -a "$1" "$backup"; }}
+fetch_source() {{ source_dir="{self.source}"; }}
 ''')
         return subprocess.run(['sh', '-e', './plymouth.sh', action], cwd=self.root, input=stdin,
                               env=dict(os.environ, PATH=str(self.root) + ':' + os.environ['PATH'], CALLS=str(self.log)),
@@ -142,6 +157,50 @@ backup_system() {{ backup="$1.backup"; cp -a "$1" "$backup"; }}
         result = self.run_script('theme', ['dracut-rebuild'], stdin='9\n')
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.calls(), ['theme spinner', 'dracut-rebuild '])
+
+    def test_dotfiles_theme_is_selected_when_installed(self):
+        (self.themes / 'garuda-mac-style-purple').mkdir()
+        (self.themes / 'garuda-mac-style-purple/garuda-mac-style-purple.plymouth').write_text('[Plymouth Theme]')
+        result = self.run_script('dotfiles', ['dracut-rebuild'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.calls(), ['theme garuda-mac-style-purple', 'dracut-rebuild '])
+
+    def test_dotfiles_theme_is_copied_from_the_repository(self):
+        vendored = self.source / 'plymouth/themes/garuda-mac-style-purple'
+        vendored.mkdir(parents=True)
+        (vendored / 'garuda-mac-style-purple.plymouth').write_text('[Plymouth Theme]')
+        (vendored / 'frame.png').write_bytes(b'png')
+        result = self.run_script('dotfiles', ['mkinitcpio'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.themes / 'garuda-mac-style-purple/frame.png').read_bytes(), b'png')
+        self.assertEqual(self.calls(), ['theme garuda-mac-style-purple', 'mkinitcpio -P'])
+
+    def test_dotfiles_theme_comes_from_a_package_or_is_explained(self):
+        self.write_tool('pacman', 'exit 0')
+        result = self.run_script('dotfiles', ['dracut-rebuild'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.calls(), ['install plymouth-theme-garuda-mac-style-purple', 'theme garuda-mac-style-purple', 'dracut-rebuild '])
+        self.log.unlink()
+        self.write_tool('pacman', 'exit 1')
+        result = self.run_script('dotfiles', ['dracut-rebuild'])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Get New', result.stderr)
+        self.assertEqual(self.calls(), [])
+
+    def test_dotfiles_theme_already_current_changes_nothing(self):
+        (self.source / 'plymouth/theme').write_text('bgrt\n')
+        (self.themes / 'bgrt').mkdir()
+        (self.themes / 'bgrt/bgrt.plymouth').write_text('[Plymouth Theme]')
+        result = self.run_script('dotfiles', ['dracut-rebuild'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('already current', result.stdout)
+        self.assertEqual(self.calls(), [])
+
+    def test_dotfiles_theme_name_is_validated(self):
+        (self.source / 'plymouth/theme').write_text('../etc\n')
+        result = self.run_script('dotfiles', ['dracut-rebuild'])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.calls(), [])
 
     def test_without_an_initramfs_tool_nothing_changes(self):
         result = self.run_script('on', ['grub-mkconfig'])

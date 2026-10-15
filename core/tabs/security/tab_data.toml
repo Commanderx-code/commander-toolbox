@@ -30,9 +30,9 @@ values = [ "firewall-cmd" ]
 
 [[data]]
 name = "AppArmor Setup and Status"
-description = "Install AppArmor tools/profiles and enable its service on Arch or Debian/Ubuntu with an AppArmor-enabled kernel. Does not change boot arguments or replace SELinux."
+description = "Install AppArmor tools/profiles and enable its service on Arch or Debian/Ubuntu. On an Arch-family system that boots with GRUB and has not enabled AppArmor yet, first offers to add the lsm= kernel parameter from the dotfiles GRUB settings and regenerate the menu, with backups; reboot and rerun afterwards. Does not replace SELinux."
 script = "../commander/apparmor.sh"
-task_list = "I MP SS"
+task_list = "I PFM MP SS"
 multi_select = false
 
 [[data.preconditions]]

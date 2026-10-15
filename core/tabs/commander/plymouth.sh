@@ -1,11 +1,13 @@
 #!/bin/sh -e
 # shellcheck source=core/tabs/commander/common.sh
 . ./common.sh
+# shellcheck source=core/tabs/commander/kernel-cmdline.sh
+. ./kernel-cmdline.sh
 commander_init
 checkCommandRequirements 'python3'
 action=${1:-theme}
 case "$action" in
-    theme | on | off) ;;
+    theme | dotfiles | on | off) ;;
     *) printf '%s\n' 'Unknown boot splash action.' >&2; exit 1 ;;
 esac
 
@@ -31,6 +33,11 @@ rebuild_initramfs() {
     # shellcheck disable=SC2086
     "$ESCALATION_TOOL" $tool
 }
+select_theme() {
+    "$ESCALATION_TOOL" plymouth-set-default-theme "$1"
+    rebuild_initramfs
+    printf 'Boot splash %s shows from the next reboot.\n' "$1"
+}
 
 if [ "$action" = theme ]; then
     checkCommandRequirements 'plymouth-set-default-theme'
@@ -50,39 +57,48 @@ if [ "$action" = theme ]; then
     chosen=$(printf '%s\n' "$themes" | sed -n "${answer}p")
     [ -n "$chosen" ] || { printf '%s\n' 'Cancelled.'; exit 1; }
     confirm "Select the '$chosen' boot splash and rebuild the boot images with '$tool'. Kernel arguments and packages are not changed."
-    "$ESCALATION_TOOL" plymouth-set-default-theme "$chosen"
-    rebuild_initramfs
-    printf 'Boot splash %s shows from the next reboot.\n' "$chosen"
+    select_theme "$chosen"
+    exit 0
+fi
+
+if [ "$action" = dotfiles ]; then
+    # The theme named in dotfiles' plymouth/theme, found the way restore-plymouth
+    # finds it: already installed, kept in the repository, or a distro package.
+    checkCommandRequirements 'plymouth-set-default-theme'
+    command_exists git || install_packages git
+    fetch_source dotfiles
+    theme=$(head -n 1 "$source_dir/plymouth/theme")
+    case "$theme" in
+        '' | *[!A-Za-z0-9._-]*) printf '%s\n' 'dotfiles names no usable Plymouth theme.' >&2; exit 1 ;;
+    esac
+    themes_dir=/usr/share/plymouth/themes
+    origin=''
+    if [ -f "$themes_dir/$theme/$theme.plymouth" ]; then
+        origin='already installed'
+    elif [ -f "$source_dir/plymouth/themes/$theme/$theme.plymouth" ]; then
+        origin='copied from dotfiles'
+    elif [ "$PACKAGER" = pacman ] && pacman -Si "plymouth-theme-$theme" >/dev/null 2>&1; then
+        origin="installed from the plymouth-theme-$theme package"
+    else
+        printf 'The %s theme is not installed, not kept in dotfiles and not a package here. Fetch it from the KDE Store (System Settings > Boot Splash Screen > Get New) and run this entry again, or pick an installed theme with the Boot Splash Theme entry. No changes made.\n' "$theme" >&2
+        exit 1
+    fi
+    if [ "$(plymouth-set-default-theme)" = "$theme" ]; then
+        printf 'Boot splash already current: %s. The Boot Splash Theme entry rebuilds the boot images if the splash has not appeared yet.\n' "$theme"
+        exit 0
+    fi
+    confirm "Select the '$theme' boot splash ($origin) and rebuild the boot images with '$tool'. Kernel arguments are not changed."
+    case "$origin" in
+        copied*) "$ESCALATION_TOOL" cp -r -- "$source_dir/plymouth/themes/$theme" "$themes_dir/" ;;
+        installed*) install_packages "plymouth-theme-$theme" ;;
+    esac
+    select_theme "$theme"
     exit 0
 fi
 
 # Turning the splash on or off means editing the kernel command line, which
 # this installer only does through /etc/default/grub.
-if [ ! -f /etc/default/grub ]; then
-    printf '%s\n' 'Boot splash changes need GRUB with /etc/default/grub. With systemd-boot or Limine, add or remove "splash" on the kernel command line yourself; no changes made.' >&2
-    exit 1
-fi
-if [ "$DTYPE" = fedora ]; then
-    generator=grub2-mkconfig
-    checker=grub2-script-check
-    output=/boot/grub2/grub.cfg
-elif command_exists grub-mkconfig && [ -d /boot/grub ]; then
-    generator=grub-mkconfig
-    checker=grub-script-check
-    output=/boot/grub/grub.cfg
-else
-    printf '%s\n' 'Unsupported GRUB layout; no changes made.' >&2
-    exit 1
-fi
-checkCommandRequirements "$generator $checker"
-# Debian drop-ins may override /etc/default/grub. Do not silently report success.
-for fragment in /etc/default/grub.d/*.cfg; do
-    [ -f "$fragment" ] || continue
-    if grep -Eq '^[[:space:]]*(export[[:space:]]+)?GRUB_CMDLINE_LINUX(_DEFAULT)?=' "$fragment"; then
-        printf 'Kernel arguments in %s override /etc/default/grub. Adjust that drop-in first; no changes made.\n' "$fragment" >&2
-        exit 1
-    fi
-done
+grub_cmdline_setup 'Boot splash changes need GRUB with /etc/default/grub. With systemd-boot or Limine, add or remove "splash" on the kernel command line yourself; no changes made.'
 hook_file=''
 if [ "$tool" = 'mkinitcpio -P' ] && [ -f /etc/mkinitcpio.conf ]; then
     hook_file=/etc/mkinitcpio.conf
@@ -94,45 +110,9 @@ if [ "$tool" = 'mkinitcpio -P' ] && [ -f /etc/mkinitcpio.conf ]; then
         fi
     done
 fi
-
-work=$(mktemp -d)
-new_menu=''
-config_pending=false
-defaults_backup=''
-cleanup_boot_splash() {
-    if [ "$config_pending" = true ]; then
-        "$ESCALATION_TOOL" cp -a -- "$defaults_backup" /etc/default/grub
-        printf '%s\n' 'GRUB generation failed or was interrupted. Previous defaults restored; existing boot menu preserved.' >&2
-    fi
-    if [ -n "$new_menu" ]; then
-        "$ESCALATION_TOOL" rm -f -- "$new_menu"
-    fi
-    rm -rf "$work"
-}
-trap cleanup_boot_splash 0
+trap grub_cmdline_cleanup 0
 trap 'exit 130' INT
 trap 'exit 143' TERM
-
-# Install new kernel arguments and regenerate the menu, keeping the old menu
-# until the new one passes its syntax check.
-apply_kernel_arguments() {
-    python3 ./configure.py grub-cmdline /etc/default/grub "$@" > "$work/defaults"
-    if cmp -s "$work/defaults" /etc/default/grub; then
-        printf '%s\n' 'Kernel arguments already as requested; GRUB menu unchanged.'
-        return 0
-    fi
-    backup_system /etc/default/grub
-    defaults_backup=$backup
-    backup_system "$output"
-    new_menu=$("$ESCALATION_TOOL" mktemp "$(dirname "$output")/.commander-grub.XXXXXX")
-    config_pending=true
-    "$ESCALATION_TOOL" install -m 644 "$work/defaults" /etc/default/grub
-    "$ESCALATION_TOOL" "$generator" -o "$new_menu"
-    "$ESCALATION_TOOL" "$checker" "$new_menu"
-    "$ESCALATION_TOOL" mv -f -- "$new_menu" "$output"
-    new_menu=''
-    config_pending=false
-}
 
 if [ "$action" = on ]; then
     case "$PACKAGER" in
@@ -145,13 +125,13 @@ if [ "$action" = on ]; then
     # shellcheck disable=SC2086
     install_packages $packages
     if [ -n "$hook_file" ]; then
-        python3 ./configure.py mkinitcpio-hooks "$hook_file" add > "$work/mkinitcpio.conf"
-        if ! cmp -s "$work/mkinitcpio.conf" "$hook_file"; then
+        python3 ./configure.py mkinitcpio-hooks "$hook_file" add > "$grub_work/mkinitcpio.conf"
+        if ! cmp -s "$grub_work/mkinitcpio.conf" "$hook_file"; then
             backup_system "$hook_file"
-            "$ESCALATION_TOOL" install -m 644 "$work/mkinitcpio.conf" "$hook_file"
+            "$ESCALATION_TOOL" install -m 644 "$grub_work/mkinitcpio.conf" "$hook_file"
         fi
     fi
-    apply_kernel_arguments add splash
+    grub_cmdline_apply add splash
     if [ "$DTYPE" = fedora ] && command_exists grubby; then
         # Fedora's boot entries carry their own arguments, which grubby maintains.
         "$ESCALATION_TOOL" grubby --update-kernel=ALL --args=splash
@@ -160,7 +140,7 @@ if [ "$action" = on ]; then
     printf '%s\n' 'Boot splash enabled from the next reboot. Pick a theme with the Boot Splash Theme entry.'
 else
     confirm "Remove 'splash' and 'rhgb' from the kernel command line in /etc/default/grub and regenerate the GRUB menu, so the system boots with text output. Plymouth, its themes and its boot image hook stay installed. Defaults and the boot menu are backed up first."
-    apply_kernel_arguments remove splash rhgb
+    grub_cmdline_apply remove splash rhgb
     if [ "$DTYPE" = fedora ] && command_exists grubby; then
         "$ESCALATION_TOOL" grubby --update-kernel=ALL --remove-args='splash rhgb'
     fi

@@ -32,14 +32,14 @@ and confirm each installation before it runs.
 | | Included |
 | :--- | :--- |
 | **A familiar shell** | Myfish setup for Fish, Bash and Zsh, with native packages or guided setup. |
-| **Your configurations** | Individual Neovim, Fastfetch, Starship, Konsole and Ghostty configurations from Commander dotfiles. |
+| **Your configurations** | Individual Neovim, Fastfetch, Starship, Konsole and Ghostty configurations from Commander dotfiles, or the whole workstation setup on Arch-based systems. |
 | **A visual system overview** | Fastfetch with automatic distro PNG logos, image dependencies and terminal detection. |
-| **Boot and login themes** | Twelve GRUB themes, a plain GRUB restore option, and the Revan SDDM theme. |
+| **Boot and login themes** | Twelve GRUB themes, a plain GRUB restore option, the Plymouth boot splash, and the SilentSDDM login screen with the dotfiles presets. |
 | **Video editing** | Native Resolve setup on Fedora/Arch, plus Davincibox on Debian/Ubuntu and derivatives, with dependency installation and a compatibility launcher. |
 | **Everyday maintenance** | A personalized Topgrade configuration and Debian Nala setup with an interactive `apt` alias. |
 | **Recovery and diagnostics** | System reports, configuration backup restoration, toolbox updates and action history. |
 | **Network printing** | Driverless IPP Everywhere setup for compatible printers on Fedora, Arch and Debian/Ubuntu. |
-| **Security tools** | AppArmor setup on supported systems and SELinux tools for Fedora. |
+| **Security tools** | AppArmor setup, including its kernel parameter on Arch, and SELinux tools for Fedora. |
 
 The wider Linutil application and system-tool catalog remains available alongside
 these custom menus.
@@ -88,9 +88,11 @@ bootstrap scripts and package installers still target Linutil.
 | :--- | :--- |
 | **Applications Setup → Design Tools** | Choose native or Davincibox installation for DaVinci Resolve. |
 | **Applications Setup → Myfish Shell Setup** | Fish, Bash, Zsh or the guided installer. |
+| **Applications Setup → Commander Workstation Setup** | Clone the dotfiles and run their guided setup on Garuda or another Arch-based system. |
 | **Applications Setup → Dotfiles** | Install only the application configurations you want. |
 | **Applications Setup → Grub Theme** | Pick a theme or restore the plain GRUB menu. |
-| **Applications Setup → SDDM Theme** | Preview the login theme before activation. |
+| **Applications Setup → Boot Splash** | Select the dotfiles boot splash or any installed Plymouth theme, or turn the splash on or off. |
+| **Applications Setup → SDDM Theme** | Preview the login theme before activation, then let SDDM run the login screen. |
 | **System Setup → Debian / Ubuntu → Nala Package Manager** | Add Nala and shell aliases while keeping the original APT executable. |
 | **Security** | Select AppArmor or Fedora SELinux tools for your system. |
 

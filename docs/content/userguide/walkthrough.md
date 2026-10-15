@@ -75,6 +75,7 @@ https://github.com/ChrisTitusTech/neovim
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
 - **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
+- **Commander Workstation Setup**: Clone Commander dotfiles to ~/github/projects/dotfiles (or update a checkout there) and run its guided setup: Zed, Ghostty, Nix and Home Manager with Fish, Starship, Fastfetch and Neovim, optional everyday apps, the SilentSDDM login screen, GRUB settings with AppArmor, the boot splash, the UFW firewall and Restic backups. For Arch-based systems with pacman, such as Garuda. The setup shows its plan and waits for APPLY before changing anything.
 
 ### Myfish Shell Setup
 
@@ -97,7 +98,7 @@ https://github.com/ChrisTitusTech/neovim
 
 ### Grub Theme
 
-- **Commander GRUB Theme**: Install your CachyOS-based GRUB theme from dotfiles. Back up existing settings and regenerate the current machine's GRUB menu while preserving kernel arguments.
+- **Commander GRUB Theme**: Install the Garuda dr460nized GRUB theme that the dotfiles GRUB settings use, from the grub-theme-garuda-dr460nized package in the Garuda repositories. Back up existing settings and regenerate the current machine's GRUB menu while preserving kernel arguments.
 - **Catppuccin Mocha GRUB Theme**: Install the pastel Mocha theme from catppuccin/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Dracula GRUB Theme**: Install the dark Dracula theme from dracula/grub. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Tela GRUB Theme**: Install Tela from vinceliuice/grub2-themes; choose 1080p, 2K or 4K assets. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
@@ -113,6 +114,7 @@ https://github.com/ChrisTitusTech/neovim
 
 ### Boot Splash
 
+- **Commander Boot Splash**: Select the Plymouth theme named in dotfiles (plymouth/theme), fetching it from the repository or a distro package when it is not installed yet, then rebuild the boot images with the distro's own tool. A theme from the KDE Store must be fetched with Get New first. Kernel arguments are not changed.
 - **Boot Splash Theme**: Choose an installed Plymouth theme for the splash shown while the system starts, then rebuild the boot images with the distro's own tool (dracut-rebuild, dracut, mkinitcpio or update-initramfs). Kernel arguments are not changed.
 - **Enable Boot Splash**: Install Plymouth, add 'splash' to the GRUB kernel command line (and the plymouth hook on mkinitcpio systems), regenerate the GRUB menu and rebuild the boot images. Backups are created before changes; the regenerated menu is syntax-checked before replacing the current one.
 - **Disable Boot Splash**: Remove 'splash' and 'rhgb' from the GRUB kernel command line and regenerate the menu, so the system boots with text output. Plymouth and its themes stay installed. Backups are created before changes.
@@ -122,7 +124,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
-- **SDDM Theme**: Install your SilentSDDM Revan theme, Qt6 dependencies and fonts. Requires existing SDDM 0.21+ and a successful graphical preview before activation.
+- **SDDM Theme**: Install SilentSDDM with the Kratos login preset and the other presets, backgrounds and settings from dotfiles, plus Qt6 dependencies and fonts. Requires SDDM 0.21+ and a successful graphical preview before activation; when another display manager runs the login screen, offers to switch it to SDDM at the next reboot.
 - **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
 - **Noctalia Shell**: Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
@@ -198,7 +200,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **FirewallD Firewall Baselines (CTT)**: Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes
 - **Lynis Security Audit**: Install Lynis when needed, run an elevated system security audit with live results, then optionally remove Lynis.
 - **UFW Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
-- **AppArmor Setup and Status**: Install AppArmor tools/profiles and enable its service on Arch or Debian/Ubuntu with an AppArmor-enabled kernel. Does not change boot arguments or replace SELinux.
+- **AppArmor Setup and Status**: Install AppArmor tools/profiles and enable its service on Arch or Debian/Ubuntu. On an Arch-family system that boots with GRUB and has not enabled AppArmor yet, first offers to add the lsm= kernel parameter from the dotfiles GRUB settings and regenerate the menu, with backups; reboot and rerun afterwards. Does not replace SELinux.
 - **Fedora SELinux Tools and Status**: Install Fedora SELinux policy, management and diagnostic tools and show status. Preserves enforcement mode and existing local policy.
 
 ## System Setup
