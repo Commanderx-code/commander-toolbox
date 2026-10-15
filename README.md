@@ -1,3 +1,17 @@
+> [!IMPORTANT]
+> **Commander Toolbox is retired.** It is replaced by
+> [HelixForge](https://github.com/Commanderx-code/Helix-Forge), which carries
+> every entry of this toolbox, runs on its own engine, and keeps following the
+> dotfiles and Myfish repositories. Run it with:
+>
+> ```sh
+> curl -fsSL https://raw.githubusercontent.com/Commanderx-code/Helix-Forge/main/start.sh | sh
+> ```
+>
+> On a machine set up from the dotfiles, the `toolbox` command already opens
+> HelixForge after `hm-rebuild`. This repository is archived and read-only; its
+> releases stay available.
+
 <p align="center">
   <img src="docs/assets/banner.svg" alt="Commander Toolbox - Your Linux setup, in one place." width="960">
 </p>
