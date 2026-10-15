@@ -19,9 +19,20 @@ cargo build --locked --release --package linutil_tui
 ./target/release/commander-toolbox
 ```
 
-This project preserves the original Linutil history and MIT license. The inherited `start.sh`, `startdev.sh`,
-package installers and release automation still belong to upstream; use the
-local Cargo commands above until a separate release channel is configured.
+Without a toolchain, `start.sh` runs the latest published Linux x86_64 build:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Commanderx-code/commander-toolbox/main/start.sh | sh
+```
+
+Inside a checkout with Cargo it runs from source instead. The download is
+checked against the release's `SHA256SUMS` before it runs and is not installed
+anywhere; `startdev.sh` does the same, since this project publishes one release
+channel. The dotfiles `toolbox` command keeps a checked copy under
+`~/.local/share/commander-toolbox` and updates it when a newer release exists.
+
+This project preserves the original Linutil history and MIT license. The
+inherited package installers and release automation still belong to upstream.
 The upstream installer/updater menu entries are removed so they cannot replace
 this build with the stock application through the menu.
 

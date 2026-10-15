@@ -46,13 +46,22 @@ these custom menus.
 
 ## Quick start
 
-You need **Git and a current Rust/Cargo toolchain**. Run as your normal user;
-installers request elevated access when needed.
+On Linux x86_64, run the latest release straight from GitHub. Run as your normal
+user; installers request elevated access when needed.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Commanderx-code/commander-toolbox/main/start.sh | sh
+```
+
+`start.sh` downloads the published build and refuses it when it does not match
+the published SHA-256 sum. Nothing is installed; run it again for the newest
+release. To build from source instead, you need **Git and a current Rust/Cargo
+toolchain**:
 
 ```sh
 git clone https://github.com/Commanderx-code/commander-toolbox.git
 cd commander-toolbox
-cargo run --locked --package linutil_tui
+./start.sh          # or: cargo run --locked --package linutil_tui
 ```
 
 **In the toolbox:** open a submenu, highlight an installable entry and press
